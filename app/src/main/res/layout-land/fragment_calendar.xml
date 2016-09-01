@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="date"
+            type="com.daohoangson.lumind.model.Lumindate" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:paddingBottom="@dimen/activityVerticalMargin"
+        android:paddingLeft="@dimen/activityHorizontalMargin"
+        android:paddingRight="@dimen/activityHorizontalMargin"
+        android:paddingTop="@dimen/activityVerticalMargin">
+
+        <include
+            layout="@layout/block_solar_pickers"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:date="@{date}" />
+
+        <ImageView
+            android:id="@+id/arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/solar_to_lunar"
+            android:src="@drawable/ic_solar2lunar"
+            android:visibility="invisible"
+            tools:visibility="visible" />
+
+        <include
+            layout="@layout/block_lunar_pickers"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:date="@{date}" />
+
+    </LinearLayout>
+</layout>

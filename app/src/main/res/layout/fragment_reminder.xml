@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="reminder"
+            type="com.daohoangson.lumind.model.Reminder" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/activityVerticalMargin"
+        android:paddingLeft="@dimen/activityHorizontalMargin"
+        android:paddingRight="@dimen/activityHorizontalMargin"
+        android:paddingTop="@dimen/activityVerticalMargin"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:context="com.daohoangson.lumind.fragment.ReminderFragment">
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.design.widget.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/form_reminder_name"
+                android:inputType="textCapWords"
+                android:text="@={reminder.name}" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.design.widget.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/form_reminder_note"
+                android:inputType="textMultiLine|textCapSentences"
+                android:maxLines="5"
+                android:text="@={reminder.note}" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checkedButton="@={reminder.monthlyOrAnnually}"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/monthly"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/form_reminder_monthly" />
+
+            <RadioButton
+                android:id="@+id/annually"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/form_reminder_annually" />
+        </RadioGroup>
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checkedButton="@={reminder.solarOrLunar}"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/solar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/form_reminder_solar" />
+
+            <RadioButton
+                android:id="@+id/lunar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/form_reminder_lunar" />
+        </RadioGroup>
+
+        <CheckBox
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/form_reminder_enabled"
+            android:checked="@={reminder.enabled}"/>
+
+    </LinearLayout>
+</layout>

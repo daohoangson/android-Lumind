@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="date"
+            type="com.daohoangson.lumind.model.Lumindate" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/containerSolar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <com.daohoangson.lumind.widget.SolarDayPicker
+            android:id="@+id/pickerSolarDay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/activityVerticalMargin"
+            android:value="@={date.solarDay}"
+            app:date_observer="@{date}" />
+
+        <com.daohoangson.lumind.widget.SolarMonthPicker
+            android:id="@+id/pickerSolarMonth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/activityVerticalMargin"
+            android:value="@={date.solarMonth}" />
+
+        <com.daohoangson.lumind.widget.YearPicker
+            android:id="@+id/pickerSolarYear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/activityVerticalMargin"
+            android:value="@={date.solarYear}" />
+    </LinearLayout>
+</layout>

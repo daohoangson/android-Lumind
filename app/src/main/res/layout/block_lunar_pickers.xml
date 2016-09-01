@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="date"
+            type="com.daohoangson.lumind.model.Lumindate" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/containerLunar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <com.daohoangson.lumind.widget.LunarDayPicker
+            android:id="@+id/pickerLunarDay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/activityVerticalMargin"
+            android:value="@={date.lunarDay}"
+            app:date_observer="@{date}" />
+
+        <com.daohoangson.lumind.widget.LunarMonthPicker
+            android:id="@+id/pickerLunarMonth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/activityVerticalMargin"
+            android:value="@={date.lunarMonthRaw}"
+            app:date_observer="@{date}" />
+
+        <com.daohoangson.lumind.widget.YearPicker
+            android:id="@+id/pickerLunarYear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/activityVerticalMargin"
+            android:value="@={date.lunarYear}" />
+    </LinearLayout>
+</layout>
