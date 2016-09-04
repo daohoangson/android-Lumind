@@ -81,7 +81,9 @@ public class RemindersFragment extends Fragment {
         ItemTouchHelper touchHelper = new ItemTouchHelper(itemTouchHelperCallback);
         touchHelper.attachToRecyclerView(mBinding.list);
 
-        startRefreshing();
+        if (savedInstanceState == null) {
+            startRefreshing();
+        }
 
         return mBinding.getRoot();
     }

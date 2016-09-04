@@ -54,7 +54,7 @@ public class DataStore {
         });
     }
 
-    public static RealmResults<ReminderPersist> getReminders(Context context, final OnGetRemindersResults listener) {
+    public static List<Reminder> getReminders(Context context, final OnGetRemindersResults listener) {
         RealmQuery<ReminderPersist> query = getInstance(context).where(ReminderPersist.class);
 
         if (listener != null) {
@@ -62,7 +62,7 @@ public class DataStore {
             realmResults.addChangeListener(new RealmChangeListener<RealmResults<ReminderPersist>>() {
                 @Override
                 public void onChange(RealmResults<ReminderPersist> elements) {
-                    ArrayList<Reminder> results = new ArrayList<>(elements.size());
+                    List<Reminder> results = new ArrayList<>(elements.size());
                     for (ReminderPersist element : elements) {
                         results.add(new Reminder(element));
                     }
@@ -71,9 +71,15 @@ public class DataStore {
                     realmResults.removeChangeListener(this);
                 }
             });
-            return realmResults;
+            return null;
         } else {
-            return query.findAll();
+            RealmResults<ReminderPersist> realmResults = query.findAll();
+            List<Reminder> results = new ArrayList<>(realmResults.size());
+            for (ReminderPersist element : realmResults) {
+                results.add(new Reminder(element));
+            }
+
+            return results;
         }
     }
 
