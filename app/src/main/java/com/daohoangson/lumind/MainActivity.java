@@ -17,7 +17,9 @@ import com.daohoangson.lumind.databinding.ActivityMainBinding;
 import com.daohoangson.lumind.fragment.CalendarFragment;
 import com.daohoangson.lumind.fragment.ReminderFragment;
 import com.daohoangson.lumind.fragment.RemindersFragment;
+import com.daohoangson.lumind.fragment.SettingFragment;
 import com.daohoangson.lumind.model.Reminder;
+import com.daohoangson.lumind.schedule.JobSchedulerService;
 
 import java.lang.ref.WeakReference;
 
@@ -36,6 +38,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(binding.toolbar);
 
         binding.viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
+        binding.viewPager.setCurrentItem(1);
         binding.tabs.setupWithViewPager(binding.viewPager, true);
 
         binding.viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -61,6 +64,13 @@ public class MainActivity extends AppCompatActivity
                 startFabAction(binding);
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        JobSchedulerService.scheduleReminderJob(this, true, 6);
     }
 
     @Override
@@ -160,15 +170,17 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
 
         @Override
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return CalendarFragment.newInstance();
+                    return SettingFragment.newInstance();
                 case 1:
+                    return CalendarFragment.newInstance();
+                case 2:
                     return RemindersFragment.newInstance();
             }
 
@@ -179,8 +191,10 @@ public class MainActivity extends AppCompatActivity
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return getString(R.string.title_fragment_calendar);
+                    return getString(R.string.title_fragment_setting);
                 case 1:
+                    return getString(R.string.title_fragment_calendar);
+                case 2:
                     return getString(R.string.title_fragment_reminders);
             }
 

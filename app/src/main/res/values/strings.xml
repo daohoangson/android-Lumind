@@ -22,6 +22,7 @@
     <string name="next_occurrence_in_x">\u00A0(in %s)</string>
     <string name="reminder_has_been_deleted">Reminder has been removed.</string>
     <string name="reminder_undelete">Undo</string>
+    <string name="title_fragment_setting">Setting</string>
     
     <plurals name="x_days">
         <item quantity="one">a day</item>
