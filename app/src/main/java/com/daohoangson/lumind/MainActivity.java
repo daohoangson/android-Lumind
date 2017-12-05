@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity
 
         int tabId = binding.viewPager.getCurrentItem();
         switch (tabId) {
-            case 0:
+            case 1:
                 if (mCalendarFragmentRef != null) {
                     CalendarFragment calendarFragment = mCalendarFragmentRef.get();
                     if (calendarFragment != null) {
@@ -173,7 +173,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
                 break;
-            case 1:
+            case 2:
                 if (mRemindersFragmentRef != null) {
                     RemindersFragment remindersFragment = mRemindersFragmentRef.get();
                     if (remindersFragment != null) {
