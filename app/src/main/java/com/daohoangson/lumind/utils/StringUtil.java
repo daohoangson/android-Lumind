@@ -30,7 +30,7 @@ public class StringUtil {
         }
 
         LunarMonth lm = date.getLunarMonth();
-        Calendar c = new GregorianCalendar(date.lunarDay.get(), lm.value, date.lunarYear.get());
+        Calendar c = new GregorianCalendar(date.lunarYear.get(), lm.value, date.lunarDay.get());
         String s = DateUtils.formatDateTime(context, c.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE);
         if (lm.leap > 0) {
             return context.getString(R.string.reminder_lunar_date_x_leap, s);
