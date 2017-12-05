@@ -9,9 +9,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
-import android.telecom.Call;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 
 import com.daohoangson.lumind.R;
@@ -29,17 +29,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author sondh
  */
 public class ReminderFragment extends DialogFragment {
-    public static final String ARG_DATE = "date";
-    public static final String ARG_REMINDER = "reminder";
-    public static final String STATE_REMINDER = "reminder";
+    private static final String ARG_DATE = "date";
+    private static final String ARG_REMINDER = "reminder";
+    private static final String STATE_REMINDER = "reminder";
 
-    Reminder mReminder = new Reminder();
-    AtomicBoolean mSaveRequested = new AtomicBoolean(false);
-    boolean mSuccess = false;
-    Throwable mError = null;
+    private final Reminder mReminder = new Reminder();
+    private final AtomicBoolean mSaveRequested = new AtomicBoolean(false);
+    private boolean mSuccess = false;
+    private Throwable mError = null;
 
-    WeakReference<CallerActivity> mCallerActivityRef;
-    Set<OnDismissListener> mListeners = new HashSet<>();
+    private WeakReference<CallerActivity> mCallerActivityRef;
+    private final Set<OnDismissListener> mListeners = new HashSet<>();
 
     public static ReminderFragment newInstance(Lumindate date) {
         ReminderFragment reminderFragment = new ReminderFragment();
@@ -74,17 +74,15 @@ public class ReminderFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+        @SuppressWarnings("ConstantConditions") @NonNull
+        Activity activity = getActivity();
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity)
                 .setCancelable(false)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        startSavingReminder();
-                    }
-                })
+                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> startSavingReminder())
                 .setNegativeButton(android.R.string.cancel, null);
 
-        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        LayoutInflater inflater = LayoutInflater.from(activity);
         FragmentReminderBinding binding = FragmentReminderBinding.inflate(inflater);
         binding.setReminder(mReminder);
 
@@ -116,10 +114,13 @@ public class ReminderFragment extends DialogFragment {
 
     @Override
     public void onResume() {
-        ViewGroup.LayoutParams params = getDialog().getWindow().getAttributes();
-        params.width = WindowManager.LayoutParams.MATCH_PARENT;
-        params.height = WindowManager.LayoutParams.WRAP_CONTENT;
-        getDialog().getWindow().setAttributes((android.view.WindowManager.LayoutParams) params);
+        Window window = getDialog().getWindow();
+        if (window != null) {
+            ViewGroup.LayoutParams params = window.getAttributes();
+            params.width = WindowManager.LayoutParams.MATCH_PARENT;
+            params.height = WindowManager.LayoutParams.WRAP_CONTENT;
+            getDialog().getWindow().setAttributes((android.view.WindowManager.LayoutParams) params);
+        }
 
         super.onResume();
     }
@@ -173,7 +174,7 @@ public class ReminderFragment extends DialogFragment {
         mListeners.add(listener);
     }
 
-    void startSavingReminder() {
+    private void startSavingReminder() {
         mSaveRequested.set(true);
         DataStore.saveEditingReminder(getContext(), mReminder, new DataStore.OnTransactionCompleteListener() {
             @Override
@@ -200,7 +201,7 @@ public class ReminderFragment extends DialogFragment {
         });
     }
 
-    void pingListeners(boolean fromSaveListener) {
+    private void pingListeners(boolean fromSaveListener) {
         if (!fromSaveListener && mSaveRequested.get()) {
             return;
         }

@@ -2,8 +2,6 @@
     <dimen name="activityHorizontalMargin">16dp</dimen>
     <dimen name="activityVerticalMargin">16dp</dimen>
     <dimen name="fabMargin">16dp</dimen>
-    <dimen name="appBarHeight">180dp</dimen>
-    <dimen name="textMargin">16dp</dimen>
 
     <dimen name="listItemPadding">6dip</dimen>
 </resources>

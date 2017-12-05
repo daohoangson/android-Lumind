@@ -16,7 +16,7 @@ import java.util.Date;
  * @author sondh
  */
 public class BindingAdapters {
-    @BindingAdapter("app:date_observer")
+    @BindingAdapter("date_observer")
     public static void bindDateToLumindPicker(LumindPicker picker, Lumindate date) {
         if (date == null) {
             return;
@@ -31,7 +31,7 @@ public class BindingAdapters {
         date.addOnPropertyChangedCallback(callback);
     }
 
-    @BindingAdapter("app:next_occurrence_text")
+    @BindingAdapter("next_occurrence_text")
     public static void bindNextOccurrenceToTextView(TextView textView, Reminder reminder) {
         Calendar calendar = Calendar.getInstance();
         Date nextDate = reminder.getNextOccurrence(calendar);

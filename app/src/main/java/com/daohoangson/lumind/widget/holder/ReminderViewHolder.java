@@ -10,7 +10,7 @@ import com.daohoangson.lumind.model.Reminder;
  */
 public class ReminderViewHolder extends RecyclerView.ViewHolder {
 
-    ListItemReminderBinding mBinding;
+    private final ListItemReminderBinding mBinding;
 
     public ReminderViewHolder(ListItemReminderBinding binding) {
         super(binding.getRoot());
@@ -19,9 +19,5 @@ public class ReminderViewHolder extends RecyclerView.ViewHolder {
 
     public void bind(Reminder reminder) {
         mBinding.setReminder(reminder);
-    }
-
-    public Reminder getReminder() {
-        return mBinding.getReminder();
     }
 }

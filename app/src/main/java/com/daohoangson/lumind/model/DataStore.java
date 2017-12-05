@@ -1,10 +1,12 @@
 package com.daohoangson.lumind.model;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.daohoangson.lumind.model.Reminder;
 import com.daohoangson.lumind.model.ReminderPersist;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,67 +22,54 @@ import io.realm.RealmResults;
 public class DataStore {
 
     public static void saveEditingReminder(final Context context, final Reminder reminder, final OnTransactionCompleteListener listener) {
-        getInstance(context).executeTransactionAsync(new io.realm.Realm.Transaction() {
-            @Override
-            public void execute(io.realm.Realm realm) {
-                realm.insertOrUpdate(reminder.build());
-            }
-        }, new Realm.Transaction.OnSuccess() {
-            @Override
-            public void onSuccess() {
-                if (listener != null) {
-                    listener.onTransactionSuccess();
+        getInstance(context).executeTransactionAsync(
+                realm -> realm.insertOrUpdate(reminder.build()),
+                () -> {
+                    if (listener != null) {
+                        listener.onTransactionSuccess();
+                    }
+                }, error -> {
+                    if (listener != null) {
+                        listener.onTransactionError(error);
+                    }
                 }
-            }
-        }, new Realm.Transaction.OnError() {
-            @Override
-            public void onError(Throwable error) {
-                if (listener != null) {
-                    listener.onTransactionError(error);
-                }
-            }
-        });
+        );
     }
 
     public static void deleteReminder(Context context, final String uuid) {
-        getInstance(context).executeTransactionAsync(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                realm.where(ReminderPersist.class)
+        getInstance(context).executeTransactionAsync(
+                realm -> realm.where(ReminderPersist.class)
                         .equalTo("uuid", uuid)
                         .findAll()
-                        .deleteAllFromRealm();
+                        .deleteAllFromRealm()
+        );
+    }
+
+    public static void getReminders(Context context, final OnGetRemindersResults listener) {
+        RealmQuery<ReminderPersist> query = getInstance(context).where(ReminderPersist.class);
+
+        final RealmResults<ReminderPersist> realmResults = query.findAllAsync();
+        realmResults.addChangeListener(new RealmChangeListener<RealmResults<ReminderPersist>>() {
+            @Override
+            public void onChange(@NonNull RealmResults<ReminderPersist> elements) {
+                List<Reminder> results = new ArrayList<>(elements.size());
+                for (ReminderPersist element : elements) {
+                    results.add(new Reminder(element));
+                }
+                listener.onResults(results);
+
+                realmResults.removeChangeListener(this);
             }
         });
     }
 
-    public static List<Reminder> getReminders(Context context, final OnGetRemindersResults listener) {
-        RealmQuery<ReminderPersist> query = getInstance(context).where(ReminderPersist.class);
-
-        if (listener != null) {
-            final RealmResults<ReminderPersist> realmResults = query.findAllAsync();
-            realmResults.addChangeListener(new RealmChangeListener<RealmResults<ReminderPersist>>() {
-                @Override
-                public void onChange(RealmResults<ReminderPersist> elements) {
-                    List<Reminder> results = new ArrayList<>(elements.size());
-                    for (ReminderPersist element : elements) {
-                        results.add(new Reminder(element));
-                    }
-                    listener.onResults(results);
-
-                    realmResults.removeChangeListener(this);
-                }
-            });
-            return null;
-        } else {
-            RealmResults<ReminderPersist> realmResults = query.findAll();
-            List<Reminder> results = new ArrayList<>(realmResults.size());
-            for (ReminderPersist element : realmResults) {
-                results.add(new Reminder(element));
-            }
-
-            return results;
+    public static void closeIfOpened() {
+        if (sInstanceRef == null) {
+            return;
         }
+
+        sInstanceRef.get().close();
+        sInstanceRef = null;
     }
 
     public interface OnTransactionCompleteListener {
@@ -93,12 +82,24 @@ public class DataStore {
         void onResults(List<Reminder> results);
     }
 
-    static Realm getInstance(Context context) {
-        RealmConfiguration realmConfig = new RealmConfiguration.Builder(context)
+    private static WeakReference<Realm> sInstanceRef;
+
+    private static Realm getInstance(Context context) {
+        if (sInstanceRef != null) {
+            return sInstanceRef.get();
+        }
+
+        Realm.init(context.getApplicationContext());
+
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder()
                 .deleteRealmIfMigrationNeeded()
                 .build();
 
-        return Realm.getInstance(realmConfig);
+        Realm r = Realm.getInstance(realmConfig);
+
+        sInstanceRef = new WeakReference<>(r);
+
+        return r;
     }
 
 }

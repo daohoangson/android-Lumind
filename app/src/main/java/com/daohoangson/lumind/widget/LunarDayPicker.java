@@ -11,7 +11,7 @@ import de.unileipzig.informatik.duc.amlich.VietCalendar;
 
 public class LunarDayPicker extends LumindPicker implements LumindPicker.DateObserver {
 
-    Observable.OnPropertyChangedCallback onDateChangedCallback = new Observable.OnPropertyChangedCallback() {
+    private final Observable.OnPropertyChangedCallback onDateChangedCallback = new Observable.OnPropertyChangedCallback() {
         @Override
         public void onPropertyChanged(Observable observable, int i) {
             Lumindate date = (Lumindate) observable;

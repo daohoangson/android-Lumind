@@ -3,7 +3,6 @@ package com.daohoangson.lumind.model;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import org.antlr.v4.runtime.misc.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -16,9 +15,10 @@ import io.realm.annotations.PrimaryKey;
 /**
  * @author sondh
  */
+@SuppressWarnings({"WeakerAccess", "CanBeFinal"})
 public class ReminderPersist extends RealmObject {
-    public static final String DATA_NOTE = "note";
-    public static final String DATA_RECURRENCE = "recurrence";
+    private static final String DATA_NOTE = "note";
+    private static final String DATA_RECURRENCE = "recurrence";
 
     @PrimaryKey
     String uuid;
@@ -39,7 +39,7 @@ public class ReminderPersist extends RealmObject {
         uuid = UUID.randomUUID().toString();
     }
 
-    ReminderPersist(@NotNull String uuid) {
+    ReminderPersist(String uuid) {
         this.uuid = uuid;
     }
 
@@ -86,7 +86,7 @@ public class ReminderPersist extends RealmObject {
         return (String) note;
     }
 
-    Recurrence getRecurrence() {
+    private Recurrence getRecurrence() {
         Object recurrenceData = getData(DATA_RECURRENCE);
         if (Recurrence.MONTHLY.name().equals(recurrenceData)) {
             return Recurrence.MONTHLY;
@@ -106,7 +106,7 @@ public class ReminderPersist extends RealmObject {
         ANNUALLY
     }
 
-    ReminderPersist withData(String name, Object value) {
+    private ReminderPersist withData(String name, Object value) {
         ensureDataObj();
 
         try {
@@ -120,7 +120,7 @@ public class ReminderPersist extends RealmObject {
         return this;
     }
 
-    Object getData(String name) {
+    private Object getData(String name) {
         ensureDataObj();
 
         if (mDataObj == null) {
@@ -138,7 +138,7 @@ public class ReminderPersist extends RealmObject {
         }
     }
 
-    void ensureDataObj() {
+    private void ensureDataObj() {
         if (mDataObj == null) {
             if (!TextUtils.isEmpty(data)) {
                 try {

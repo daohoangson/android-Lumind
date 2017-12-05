@@ -1,8 +1,6 @@
 package com.daohoangson.lumind.model;
 
-import android.app.Application;
 import android.content.Context;
-import android.util.Pair;
 
 import com.daohoangson.lumind.R;
 
@@ -53,7 +51,7 @@ public class LunarMonth {
         return getLunarMonths(lunarYear, null, 0);
     }
 
-    static void addMonth(ArrayList<LunarMonth> months, int value, int leap, Map<String, Integer> displayNames, Context context) {
+    private static void addMonth(ArrayList<LunarMonth> months, int value, int leap, Map<String, Integer> displayNames, Context context) {
         LunarMonth m = new LunarMonth();
         m.value = value;
         m.leap = leap;

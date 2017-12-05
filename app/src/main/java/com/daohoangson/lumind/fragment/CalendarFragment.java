@@ -5,9 +5,11 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.databinding.Observable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -23,10 +25,10 @@ import com.daohoangson.lumind.model.Lumindate;
  * @author sondh
  */
 public class CalendarFragment extends Fragment {
-    public static final String STATE_DATE = "date";
+    private static final String STATE_DATE = "date";
 
-    Lumindate mDate = new Lumindate();
-    FragmentCalendarBinding mBinding;
+    private final Lumindate mDate = new Lumindate();
+    private FragmentCalendarBinding mBinding;
 
     public static CalendarFragment newInstance() {
         return new CalendarFragment();
@@ -39,7 +41,7 @@ public class CalendarFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBinding = FragmentCalendarBinding.inflate(inflater, container, false);
         mBinding.setDate(mDate);
 
@@ -78,7 +80,7 @@ public class CalendarFragment extends Fragment {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(STATE_DATE, mDate);
     }
@@ -88,26 +90,38 @@ public class CalendarFragment extends Fragment {
     }
 
     public void startFabAction() {
-        FragmentManager fm = getActivity().getSupportFragmentManager();
+        FragmentActivity activity = getActivity();
+        if (activity == null) {
+            return;
+        }
+
+        FragmentManager fm = activity.getSupportFragmentManager();
         ReminderFragment reminderFragment = ReminderFragment.newInstance(mDate);
         reminderFragment.show(fm, reminderFragment.toString());
     }
 
-    void updateViews() {
+    private void updateViews() {
         ImageView arrow = mBinding.arrow;
-        int arrowDrawable = 0;
+        int resDrawable = 0;
+        int resDescription = 0;
         switch (mDate.getLastChanged()) {
             case SOLAR:
-                arrowDrawable = R.drawable.ic_solar2lunar;
+                resDrawable = R.drawable.ic_solar2lunar;
+                resDescription = R.string.solar_to_lunar;
                 break;
             case LUNAR:
-                arrowDrawable = R.drawable.ic_lunar2solar;
+                resDrawable = R.drawable.ic_lunar2solar;
+                resDescription = R.string.lunar_to_solar;
                 break;
         }
 
-        Context context = getContext();
         arrow.setVisibility(View.VISIBLE);
-        arrow.setImageDrawable(ContextCompat.getDrawable(context, arrowDrawable));
+        arrow.setContentDescription(getString(resDescription));
+
+        Context context = getContext();
+        if (context != null) {
+            arrow.setImageDrawable(ContextCompat.getDrawable(context, resDrawable));
+        }
 
         Activity activity = getActivity();
         if (activity instanceof CallerActivity) {
@@ -115,7 +129,7 @@ public class CalendarFragment extends Fragment {
         }
     }
 
-    void updateFab(FloatingActionButton fab) {
+    private void updateFab(FloatingActionButton fab) {
         if (fab == null) {
             return;
         }
@@ -133,9 +147,12 @@ public class CalendarFragment extends Fragment {
                 break;
         }
 
-        Context context = getContext();
         fab.setVisibility(View.VISIBLE);
-        fab.setImageDrawable(ContextCompat.getDrawable(context, fabDrawable));
-        fab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(context, fabColor)));
+
+        Context context = getContext();
+        if (context != null) {
+            fab.setImageDrawable(ContextCompat.getDrawable(context, fabDrawable));
+            fab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(context, fabColor)));
+        }
     }
 }

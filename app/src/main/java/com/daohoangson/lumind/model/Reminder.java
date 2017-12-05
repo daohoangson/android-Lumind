@@ -20,14 +20,14 @@ public class Reminder implements Parcelable {
 
     public String existingUuid;
 
-    public Lumindate date = new Lumindate();
-    public ObservableInt solarOrLunar = new ObservableInt(R.id.solar);
-    public ObservableInt monthlyOrAnnually = new ObservableInt(R.id.monthly);
-    public ObservableField<String> name = new ObservableField<>("");
-    public ObservableField<String> note = new ObservableField<>("");
-    public ObservableBoolean enabled = new ObservableBoolean(true);
+    public final Lumindate date = new Lumindate();
+    public final ObservableInt solarOrLunar = new ObservableInt(R.id.solar);
+    public final ObservableInt monthlyOrAnnually = new ObservableInt(R.id.monthly);
+    public final ObservableField<String> name = new ObservableField<>("");
+    public final ObservableField<String> note = new ObservableField<>("");
+    public final ObservableBoolean enabled = new ObservableBoolean(true);
 
-    Date mNextOccurrence = null;
+    private Date mNextOccurrence = null;
 
     public Reminder() {
         setupCallbacks();
@@ -38,7 +38,7 @@ public class Reminder implements Parcelable {
         setupCallbacks();
     }
 
-    Reminder(Parcel in) {
+    private Reminder(Parcel in) {
         date.sync((Lumindate) in.readParcelable(Lumindate.class.getClassLoader()));
         setSolar(in.readInt() > 0);
         setMonthly(in.readInt() > 0);
@@ -49,6 +49,7 @@ public class Reminder implements Parcelable {
         setupCallbacks();
     }
 
+    @SuppressWarnings("unused")
     public static final Creator<Reminder> CREATOR = new Creator<Reminder>() {
         @Override
         public Reminder createFromParcel(Parcel in) {
@@ -76,7 +77,7 @@ public class Reminder implements Parcelable {
         parcel.writeInt(enabled.get() ? 1 : 0);
     }
 
-    void setupCallbacks() {
+    private void setupCallbacks() {
         Observable.OnPropertyChangedCallback resetNextOccurrenceCallback = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable observable, int i) {
@@ -100,7 +101,7 @@ public class Reminder implements Parcelable {
         enabled.set(other.enabled.get());
     }
 
-    public void sync(ReminderPersist persist) {
+    private void sync(ReminderPersist persist) {
         existingUuid = persist.uuid;
 
         date.sync(persist);
@@ -127,7 +128,7 @@ public class Reminder implements Parcelable {
         }
     }
 
-    public ReminderPersist build() {
+    ReminderPersist build() {
         ReminderPersist persist;
         if (existingUuid != null) {
             persist = new ReminderPersist(existingUuid);
@@ -135,16 +136,15 @@ public class Reminder implements Parcelable {
             persist = new ReminderPersist();
         }
 
-        if (monthlyOrAnnually.get() == R.id.monthly) {
-            persist.withRecurrence(ReminderPersist.Recurrence.MONTHLY);
-        } else {
-            persist.withRecurrence(ReminderPersist.Recurrence.ANNUALLY);
-        }
+        ReminderPersist.Recurrence recurrence = monthlyOrAnnually.get() == R.id.monthly ?
+                ReminderPersist.Recurrence.MONTHLY :
+                ReminderPersist.Recurrence.ANNUALLY;
 
         return persist.withDate(date, getSolar())
+                .withEnabled(enabled.get())
                 .withName(name.get())
                 .withNote(note.get())
-                .withEnabled(enabled.get());
+                .withRecurrence(recurrence);
     }
 
     public boolean getSolar() {
@@ -175,7 +175,7 @@ public class Reminder implements Parcelable {
         return mNextOccurrence;
     }
 
-    Date getNextOccurrenceSolar(@NonNull Calendar since) {
+    private Date getNextOccurrenceSolar(@NonNull Calendar since) {
         int calendarMonth = since.get(Calendar.MONTH);
         int calendarYear = since.get(Calendar.YEAR);
         Date now = since.getTime();
@@ -209,7 +209,7 @@ public class Reminder implements Parcelable {
         return c.getTime();
     }
 
-    Date getNextOccurrenceLunar(@NonNull Calendar since) {
+    private Date getNextOccurrenceLunar(@NonNull Calendar since) {
         Calendar c = (Calendar) since.clone();
 
         while (true) {

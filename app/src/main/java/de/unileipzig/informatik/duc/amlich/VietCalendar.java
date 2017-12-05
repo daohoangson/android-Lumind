@@ -4,14 +4,14 @@ package de.unileipzig.informatik.duc.amlich;
  * @author duc
  */
 public class VietCalendar {
-    public static final double PI = Math.PI;
-    public static final double CONSTANT_2415021 = 2415021.076998695;
-    public static final double CONSTANT_29 = 29.530588853;
+    private static final double PI = Math.PI;
+    private static final double CONSTANT_2415021 = 2415021.076998695;
+    private static final double CONSTANT_29 = 29.530588853;
 
     /**
      * @return the number of days since 1 January 4713 BC (Julian calendar)
      */
-    public static int jdFromDate(int dd, int mm, int yy) {
+    private static int jdFromDate(int dd, int mm, int yy) {
         int a = (14 - mm) / 12;
         int y = yy + 4800 - a;
         int m = mm + 12 * a - 3;
@@ -30,7 +30,7 @@ public class VietCalendar {
      * @param jd - the number of days since 1 January 4713 BC (Julian calendar)
      * @return array of (day, month, year)
      */
-    public static int[] jdToDate(int jd) {
+    private static int[] jdToDate(int jd) {
         int a, b, c;
         if (jd > 2299160) { // After 5/10/1582, Gregorian calendar
             a = jd + 32044;
@@ -55,7 +55,7 @@ public class VietCalendar {
      * @param jdn - number of days since noon UTC on 1 January 4713 BC
      * @return solar longitude in degrees
      */
-    public static double SunLongitude(double jdn) {
+    private static double SunLongitude(double jdn) {
         double T = (jdn - 2451545.0) / 36525; // Time in Julian centuries from 2000-01-01 12:00:00 GMT
         double T2 = T * T;
         double dr = PI / 180; // degree to radian
@@ -75,7 +75,7 @@ public class VietCalendar {
      *
      * @return the Julian date number (number of days since noon UTC on 1 January 4713 BC) of the New Moon
      */
-    public static double NewMoon(int k) {
+    private static double NewMoon(int k) {
         double T = k / 1236.85; // Time in Julian centuries from 1900 January 0.5
         double T2 = T * T;
         double T3 = T2 * T;
@@ -102,20 +102,20 @@ public class VietCalendar {
         return Jd1 + C1 - deltaT;
     }
 
-    public static int INT(double d) {
+    private static int INT(double d) {
         return (int) Math.floor(d);
     }
 
-    public static double getSunLongitude(int dayNumber, double timeZone) {
+    private static double getSunLongitude(int dayNumber, double timeZone) {
         return SunLongitude(dayNumber - 0.5 - timeZone / 24);
     }
 
-    public static int getNewMoonDay(int k, double timeZone) {
+    private static int getNewMoonDay(int k, double timeZone) {
         double jd = NewMoon(k);
         return INT(jd + 0.5 + timeZone / 24);
     }
 
-    public static int getLunarMonth11(int yy, double timeZone) {
+    private static int getLunarMonth11(int yy, double timeZone) {
         double off = jdFromDate(31, 12, yy) - CONSTANT_2415021;
         int k = INT(off / CONSTANT_29);
         int nm = getNewMoonDay(k, timeZone);
@@ -126,7 +126,7 @@ public class VietCalendar {
         return nm;
     }
 
-    public static int getLeapMonthOffset(int a11, double timeZone) {
+    private static int getLeapMonthOffset(int a11, double timeZone) {
         int k = getLunarMonthK(a11);
         int last; // Month 11 contains point of sun longitude 3*PI/2 (December solstice)
         int i = 1; // We start with the month following lunar month 11
@@ -187,11 +187,11 @@ public class VietCalendar {
         return jdToDate(monthStart + lunarDay - 1);
     }
 
-    public static int getLunarMonthK(int lunarMonth11) {
+    private static int getLunarMonthK(int lunarMonth11) {
         return INT(0.5 + (lunarMonth11 - CONSTANT_2415021) / CONSTANT_29);
     }
 
-    public static int getLunarMonthOffset(int lunarMonth, int lunarYear, int lunarLeap, double timeZone) {
+    private static int getLunarMonthOffset(int lunarMonth, int lunarYear, int lunarLeap, double timeZone) {
         int a11, b11;
         if (lunarMonth < 11) {
             a11 = getLunarMonth11(lunarYear - 1, timeZone);
@@ -231,7 +231,7 @@ public class VietCalendar {
         return nextMonthStart - monthStart;
     }
 
-    public static int getLunarLeapMonth(int lunarMonth11, double timeZone) {
+    private static int getLunarLeapMonth(int lunarMonth11, double timeZone) {
         int leapOff = getLeapMonthOffset(lunarMonth11, timeZone);
         int leapMonth = leapOff - 2;
         if (leapMonth < 0) {

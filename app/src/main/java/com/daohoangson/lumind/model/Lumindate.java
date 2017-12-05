@@ -22,15 +22,15 @@ import de.unileipzig.informatik.duc.amlich.VietCalendar;
  */
 public class Lumindate extends BaseObservable implements Parcelable, Serializable {
 
-    public ObservableInt solarDay;
-    public ObservableInt solarMonth;
-    public ObservableInt solarYear;
+    public final ObservableInt solarDay;
+    public final ObservableInt solarMonth;
+    public final ObservableInt solarYear;
     public ObservableInt lunarDay;
     public ObservableInt lunarMonthRaw;
     public ObservableInt lunarYear;
 
-    AtomicBoolean mCorrectnessGuarantee = new AtomicBoolean(true);
-    FieldGroup mLastChanged = FieldGroup.SOLAR;
+    private final AtomicBoolean mCorrectnessGuarantee = new AtomicBoolean(true);
+    private FieldGroup mLastChanged = FieldGroup.SOLAR;
 
     public Lumindate() {
         Calendar c = Calendar.getInstance();
@@ -82,6 +82,7 @@ public class Lumindate extends BaseObservable implements Parcelable, Serializabl
         setupCallbacks();
     }
 
+    @SuppressWarnings("unused")
     public static final Creator<Lumindate> CREATOR = new Creator<Lumindate>() {
         @Override
         public Lumindate createFromParcel(Parcel in) {
@@ -113,14 +114,14 @@ public class Lumindate extends BaseObservable implements Parcelable, Serializabl
                 lunarYear.get(), lunarMonthRaw.get(), lunarDay.get());
     }
 
-    void initLunarValues() {
+    private void initLunarValues() {
         lunarDay = new ObservableInt(0);
         lunarMonthRaw = new ObservableInt(0);
         lunarYear = new ObservableInt(0);
         calculateLunar();
     }
 
-    void setupCallbacks() {
+    private void setupCallbacks() {
         Observable.OnPropertyChangedCallback solarCallback = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable observable, int i) {
@@ -158,7 +159,7 @@ public class Lumindate extends BaseObservable implements Parcelable, Serializabl
         lunarYear.addOnPropertyChangedCallback(lunarCallback);
     }
 
-    void validateLunarValues() {
+    private void validateLunarValues() {
         int lunarDayInt = lunarDay.get();
         if (lunarDayInt < 1) {
             lunarDay.set(1);
@@ -184,7 +185,7 @@ public class Lumindate extends BaseObservable implements Parcelable, Serializabl
         }
     }
 
-    void validateSolarValues() {
+    private void validateSolarValues() {
         int solarDayInt = solarDay.get();
         if (solarDayInt < 1) {
             solarDay.set(1);
@@ -206,7 +207,7 @@ public class Lumindate extends BaseObservable implements Parcelable, Serializabl
         }
     }
 
-    void calculateLunar() {
+    private void calculateLunar() {
         int solarDayInt = solarDay.get();
         int solarMonthInt = solarMonth.get();
         int solarYearInt = solarYear.get();
@@ -230,7 +231,7 @@ public class Lumindate extends BaseObservable implements Parcelable, Serializabl
         }
     }
 
-    void calculateSolar() {
+    private void calculateSolar() {
         int lunarDayInt = lunarDay.get();
         LunarMonth m = getLunarMonth();
         int lunarYearInt = lunarYear.get();
