@@ -11,9 +11,7 @@ import com.daohoangson.lumind.model.Reminder;
 import java.util.Calendar;
 import java.util.Date;
 
-/**
- * @author sondh
- */
+@SuppressWarnings("WeakerAccess")
 public class BindingAdapters {
     @BindingAdapter("date_observer")
     public static void bindDateToLumindPicker(LumindPicker picker, Lumindate date) {

@@ -25,9 +25,10 @@ public class Lumindate extends BaseObservable implements Parcelable, Serializabl
     public final ObservableInt solarDay;
     public final ObservableInt solarMonth;
     public final ObservableInt solarYear;
-    public ObservableInt lunarDay;
-    public ObservableInt lunarMonthRaw;
-    public ObservableInt lunarYear;
+    public final ObservableInt lunarDay;
+    @SuppressWarnings("WeakerAccess")
+    public final ObservableInt lunarMonthRaw;
+    public final ObservableInt lunarYear;
 
     private final AtomicBoolean mCorrectnessGuarantee = new AtomicBoolean(true);
     private FieldGroup mLastChanged = FieldGroup.SOLAR;
@@ -37,8 +38,11 @@ public class Lumindate extends BaseObservable implements Parcelable, Serializabl
         solarDay = new ObservableInt(c.get(Calendar.DATE));
         solarMonth = new ObservableInt(c.get(Calendar.MONTH));
         solarYear = new ObservableInt(c.get(Calendar.YEAR));
+        lunarDay = new ObservableInt(0);
+        lunarMonthRaw = new ObservableInt(0);
+        lunarYear = new ObservableInt(0);
 
-        initLunarValues();
+        calculateLunar();
         setupCallbacks();
     }
 
@@ -46,9 +50,12 @@ public class Lumindate extends BaseObservable implements Parcelable, Serializabl
         solarDay = new ObservableInt(day);
         solarMonth = new ObservableInt(month);
         solarYear = new ObservableInt(year);
+        lunarDay = new ObservableInt(0);
+        lunarMonthRaw = new ObservableInt(0);
+        lunarYear = new ObservableInt(0);
 
         validateSolarValues();
-        initLunarValues();
+        calculateLunar();
         setupCallbacks();
     }
 
@@ -56,10 +63,10 @@ public class Lumindate extends BaseObservable implements Parcelable, Serializabl
         solarDay = new ObservableInt(0);
         solarMonth = new ObservableInt(0);
         solarYear = new ObservableInt(0);
-
         this.lunarDay = new ObservableInt(lunarDay);
         this.lunarMonthRaw = new ObservableInt(0);
         this.lunarYear = new ObservableInt(lunarYear);
+
         List<LunarMonth> months = LunarMonth.getLunarMonths(lunarYear);
         for (int monthId = 0; monthId < months.size(); monthId++) {
             LunarMonth m = months.get(monthId);
@@ -77,8 +84,11 @@ public class Lumindate extends BaseObservable implements Parcelable, Serializabl
         solarDay = new ObservableInt(in.readInt());
         solarMonth = new ObservableInt(in.readInt());
         solarYear = new ObservableInt(in.readInt());
+        lunarDay = new ObservableInt(0);
+        lunarMonthRaw = new ObservableInt(0);
+        lunarYear = new ObservableInt(0);
 
-        initLunarValues();
+        calculateLunar();
         setupCallbacks();
     }
 
@@ -112,13 +122,6 @@ public class Lumindate extends BaseObservable implements Parcelable, Serializabl
         return String.format(Locale.US, "[Solar(%d-%d-%d),Lunar(%d-%d-%d)]",
                 solarYear.get(), solarMonth.get(), solarDay.get(),
                 lunarYear.get(), lunarMonthRaw.get(), lunarDay.get());
-    }
-
-    private void initLunarValues() {
-        lunarDay = new ObservableInt(0);
-        lunarMonthRaw = new ObservableInt(0);
-        lunarYear = new ObservableInt(0);
-        calculateLunar();
     }
 
     private void setupCallbacks() {
@@ -214,10 +217,6 @@ public class Lumindate extends BaseObservable implements Parcelable, Serializabl
 
         int[] lunarValues = VietCalendar.convertSolar2Lunar(solarDayInt,
                 solarMonthInt + 1, solarYearInt, getTimeZoneOffset());
-//        Log.d("Lumindate", String.format("calculateLunar %d,%d,%d -> %d,%d,%d,%d",
-//                solarDayInt, solarMonthInt, solarYearInt,
-//                lunarValues[0], lunarValues[1], lunarValues[2], lunarValues[3]));
-
 
         lunarDay.set(lunarValues[0]);
         lunarYear.set(lunarValues[2]);
@@ -251,7 +250,7 @@ public class Lumindate extends BaseObservable implements Parcelable, Serializabl
         setSolarDate(other.solarDay.get(), other.solarMonth.get(), other.solarYear.get());
     }
 
-    public void sync(ReminderPersist persist) {
+    void sync(ReminderPersist persist) {
         if (persist.solar) {
             setSolarDate(persist.day, persist.month, persist.year);
         } else {
@@ -259,7 +258,7 @@ public class Lumindate extends BaseObservable implements Parcelable, Serializabl
         }
     }
 
-    public void setSolarDate(int day, int month, int year) {
+    void setSolarDate(int day, int month, int year) {
         boolean flag = mCorrectnessGuarantee.getAndSet(false);
 
         solarDay.set(day);
@@ -271,7 +270,7 @@ public class Lumindate extends BaseObservable implements Parcelable, Serializabl
         mCorrectnessGuarantee.set(flag);
     }
 
-    public void setLunarDate(int day, int month, int year) {
+    void setLunarDate(int day, int month, int year) {
         boolean flag = mCorrectnessGuarantee.getAndSet(false);
 
         lunarDay.set(day);
