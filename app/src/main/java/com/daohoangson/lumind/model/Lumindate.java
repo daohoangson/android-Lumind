@@ -251,11 +251,7 @@ public class Lumindate extends BaseObservable implements Parcelable, Serializabl
     }
 
     void sync(ReminderPersist persist) {
-        if (persist.solar) {
-            setSolarDate(persist.day, persist.month, persist.year);
-        } else {
-            setLunarDate(persist.day, persist.month, persist.year);
-        }
+        setSolarDate(persist.solarDay, persist.solarMonth, persist.solarYear);
     }
 
     void setSolarDate(int day, int month, int year) {

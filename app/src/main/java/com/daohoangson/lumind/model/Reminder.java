@@ -110,9 +110,9 @@ public class Reminder implements Parcelable {
         existingUuid = persist.uuid;
 
         date.sync(persist);
-        solar.set(persist.solar);
+        solar.set(persist.getSolar());
         setMonthly(persist.getMonthly());
-        name.set(persist.name);
+        name.set(persist.getName());
         note.set(persist.getNote());
         enabled.set(persist.enabled);
     }
@@ -137,11 +137,16 @@ public class Reminder implements Parcelable {
                 ReminderPersist.Recurrence.MONTHLY :
                 ReminderPersist.Recurrence.ANNUALLY;
 
-        return persist.withDate(date, solar.get())
+        ReminderPersist.CalendarSystem cs = solar.get() ?
+                ReminderPersist.CalendarSystem.SOLAR :
+                ReminderPersist.CalendarSystem.LUNAR;
+
+        return persist.withDate(date)
                 .withEnabled(enabled.get())
                 .withName(name.get())
                 .withNote(note.get())
-                .withRecurrence(recurrence);
+                .withRecurrence(recurrence)
+                .withCalendarSystem(cs);
     }
 
     private boolean getMonthly() {

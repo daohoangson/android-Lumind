@@ -64,15 +64,16 @@ public class ReminderEngine {
                 continue;
             }
 
-            Lumindate date = new Lumindate(reminder.day, reminder.month, reminder.year);
+            Lumindate date = new Lumindate(reminder.solarDay, reminder.solarMonth, reminder.solarYear);
             boolean monthly = reminder.getMonthly();
-            Date no = NextOccurrence.calculate(since, date, reminder.solar, monthly);
+            boolean solar = reminder.getSolar();
+            Date no = NextOccurrence.calculate(since, date, solar, monthly);
             if (no.after(cutOffDate)) {
                 continue;
             }
 
-            String contentTitle = reminder.name;
-            String formattedDate = StringUtil.formatDate(context, date, reminder.solar, monthly);
+            String contentTitle = reminder.getName();
+            String formattedDate = StringUtil.formatDate(context, date, solar, monthly);
             String nextOccurrenceInX = StringUtil.formatNextOccurrenceInX(context.getResources(), since, no);
             String contentText = formattedDate + nextOccurrenceInX;
             int ntfId = (int) (no.getTime() / 1000 / 86400);
