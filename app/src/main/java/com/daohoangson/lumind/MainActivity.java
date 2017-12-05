@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
@@ -21,12 +22,11 @@ import com.daohoangson.lumind.fragment.RemindersFragment;
 import com.daohoangson.lumind.fragment.SettingsFragment;
 import com.daohoangson.lumind.model.DataStore;
 import com.daohoangson.lumind.model.Reminder;
+import com.daohoangson.lumind.schedule.AlarmReceiver;
 import com.daohoangson.lumind.schedule.ReminderEngine;
-import com.daohoangson.lumind.schedule.ReminderService;
 import com.daohoangson.lumind.utils.PrefUtil;
 
 import java.lang.ref.WeakReference;
-import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity
         implements CalendarFragment.CallerActivity,
@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity
 
     private static final String ARG_NTF_REMINDER_NTF_ID = "ntfReminderNtfId";
     private static final String ARG_NTF_REMINDER_UUID = "ntfReminderUuid";
+    private static final String TAG = "MainActivity";
 
     private WeakReference<CalendarFragment> mCalendarFragmentRef;
     private WeakReference<RemindersFragment> mRemindersFragmentRef;
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
 
         if (PrefUtil.getRemind(this)) {
-            ReminderService.scheduleSelf(this, true);
+            AlarmReceiver.setup(this);
         }
 
         Intent intent = getIntent();
@@ -145,15 +146,11 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onReminderError(Reminder reminder, Throwable error, boolean hasListeners) {
-        if (BuildConfig.DEBUG) {
-            Snackbar.make(findViewById(R.id.viewPager),
-                    String.format("%s %s %s", reminder.toString(), error.getMessage(), hasListeners),
-                    Snackbar.LENGTH_SHORT).show();
-        } else {
-            Snackbar.make(findViewById(R.id.viewPager),
-                    R.string.form_reminder_error,
-                    Snackbar.LENGTH_SHORT).show();
-        }
+        Log.d(TAG, String.format("%s %s %s", reminder.toString(), error.getMessage(), hasListeners));
+
+        Snackbar.make(findViewById(R.id.viewPager),
+                R.string.form_reminder_error,
+                Snackbar.LENGTH_SHORT).show();
     }
 
     @Override

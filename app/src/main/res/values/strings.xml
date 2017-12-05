@@ -33,7 +33,6 @@
     <string name="pref_remind_how_far">How far away to remind</string>
     <string name="pref_remind_how_far_summary">%s</string>
     <string name="reminder_ntf_channel_name">Daily Reminder</string>
-    <string name="reminder_ntf_content_title">Daily Reminder</string>
 
     <string-array name="pref_remind_how_far">
         <item>A day</item>

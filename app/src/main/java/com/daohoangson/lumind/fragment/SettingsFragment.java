@@ -1,12 +1,13 @@
 package com.daohoangson.lumind.fragment;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.preference.PreferenceFragmentCompat;
 
 import com.daohoangson.lumind.R;
+import com.daohoangson.lumind.schedule.AlarmReceiver;
 import com.daohoangson.lumind.schedule.ReminderEngine;
-import com.daohoangson.lumind.schedule.ReminderService;
 
 /**
  * @author sondh
@@ -39,10 +40,13 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (PREF_REMIND.equals(key)) {
             boolean prefRemind = sharedPreferences.getBoolean(key, false);
-            ReminderService.scheduleSelf(getContext(), prefRemind);
+            Context context = getContext();
 
             if (prefRemind) {
-                ReminderEngine.remind(getContext());
+                AlarmReceiver.setup(context);
+                ReminderEngine.remind(context);
+            } else {
+                AlarmReceiver.cancel(context);
             }
         }
     }

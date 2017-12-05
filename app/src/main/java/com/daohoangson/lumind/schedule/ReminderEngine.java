@@ -10,7 +10,6 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
-import com.daohoangson.lumind.BuildConfig;
 import com.daohoangson.lumind.Constant;
 import com.daohoangson.lumind.MainActivity;
 import com.daohoangson.lumind.R;
@@ -75,9 +74,7 @@ public class ReminderEngine {
 
             manager.createNotificationChannel(channel);
 
-            if (BuildConfig.DEBUG) {
-                Log.d(TAG, "Created notification channel");
-            }
+            Log.d(TAG, "Created notification channel");
         }
 
         for (Reminder reminder : comingSoon) {
@@ -99,9 +96,7 @@ public class ReminderEngine {
 
             manager.notify(ntfId, builder.build());
 
-            if (BuildConfig.DEBUG) {
-                Log.d(TAG, String.format(Locale.US, "Built notification #%d %s", ntfId, contentTitle));
-            }
+            Log.d(TAG, String.format(Locale.US, "Built notification #%d %s", ntfId, contentTitle));
         }
     }
 }
