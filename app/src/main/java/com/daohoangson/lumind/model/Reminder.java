@@ -15,7 +15,6 @@ import com.daohoangson.lumind.R;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Locale;
 
 import de.unileipzig.informatik.duc.amlich.VietCalendar;
 
@@ -30,6 +29,7 @@ public class Reminder implements Parcelable {
     public final ObservableField<String> note = new ObservableField<>("");
     public final ObservableBoolean enabled = new ObservableBoolean(true);
 
+    private Calendar mNextOccurrenceSince = null;
     private Date mNextOccurrence = null;
 
     public Reminder() {
@@ -183,12 +183,24 @@ public class Reminder implements Parcelable {
     }
 
     public Date getNextOccurrence(@NonNull Calendar since) {
+        if (mNextOccurrence != null) {
+            if (mNextOccurrenceSince == null) {
+                mNextOccurrence = null;
+            } else {
+                if (mNextOccurrenceSince.equals(since)) {
+                    mNextOccurrence = null;
+                }
+            }
+        }
+
         if (mNextOccurrence == null) {
             if (getSolar()) {
                 mNextOccurrence = getNextOccurrenceSolar(since);
             } else {
                 mNextOccurrence = getNextOccurrenceLunar(since);
             }
+
+            mNextOccurrenceSince = (Calendar) since.clone();
         }
 
         return mNextOccurrence;

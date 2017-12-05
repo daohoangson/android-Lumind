@@ -1,11 +1,10 @@
 package com.daohoangson.lumind.widget;
 
-import android.content.res.Resources;
 import android.databinding.BindingAdapter;
 import android.databinding.Observable;
 import android.widget.TextView;
 
-import com.daohoangson.lumind.R;
+import com.daohoangson.lumind.utils.StringUtil;
 import com.daohoangson.lumind.model.Lumindate;
 import com.daohoangson.lumind.model.Reminder;
 
@@ -35,24 +34,8 @@ public class BindingAdapters {
     public static void bindNextOccurrenceToTextView(TextView textView, Reminder reminder) {
         Calendar calendar = Calendar.getInstance();
         Date nextDate = reminder.getNextOccurrence(calendar);
+        String txt = StringUtil.formatNextOccurrenceInX(textView.getResources(), calendar, nextDate);
 
-        long today = calendar.getTimeInMillis();
-        long next = nextDate.getTime();
-        long durationInSec = (next - today) / 1000;
-        int days = (int) Math.ceil(durationInSec / 86400.0);
-        int months = (int) Math.ceil(days / 31.0);
-
-        Resources r = textView.getResources();
-        String txt = null;
-        if (months > 1) {
-            txt = r.getString(R.string.next_occurrence_in_x, r.getQuantityString(R.plurals.x_months, months, months));
-        } else if (days > 0) {
-            txt = r.getString(R.string.next_occurrence_in_x, r.getQuantityString(R.plurals.x_days, days, days));
-        }
-        if (txt != null) {
-            textView.setText(txt);
-        } else {
-            textView.setText("");
-        }
+        textView.setText(txt);
     }
 }

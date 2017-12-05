@@ -1,6 +1,7 @@
 package com.daohoangson.lumind;
 
 import android.content.Context;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -10,6 +11,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
@@ -17,8 +19,12 @@ import com.daohoangson.lumind.databinding.ActivityMainBinding;
 import com.daohoangson.lumind.fragment.CalendarFragment;
 import com.daohoangson.lumind.fragment.ReminderFragment;
 import com.daohoangson.lumind.fragment.RemindersFragment;
+import com.daohoangson.lumind.fragment.SettingsFragment;
 import com.daohoangson.lumind.model.DataStore;
 import com.daohoangson.lumind.model.Reminder;
+import com.daohoangson.lumind.schedule.AlarmReceiver;
+import com.daohoangson.lumind.schedule.ReminderEngine;
+import com.daohoangson.lumind.utils.PrefUtil;
 
 import java.lang.ref.WeakReference;
 
@@ -27,8 +33,22 @@ public class MainActivity extends AppCompatActivity
         ReminderFragment.CallerActivity,
         RemindersFragment.CallerActivity {
 
+    private static final String ARG_NTF_REMINDER_NTF_ID = "ntfReminderNtfId";
+    private static final String ARG_NTF_REMINDER_UUID = "ntfReminderUuid";
+    private static final String TAG = "MainActivity";
+
     private WeakReference<CalendarFragment> mCalendarFragmentRef;
     private WeakReference<RemindersFragment> mRemindersFragmentRef;
+    private Reminder mPendingNtfReminder;
+
+    public static Intent newNtfIntent(Context context, int ntfId, Reminder reminder) {
+        Intent i = new Intent(context, MainActivity.class);
+
+        i.putExtra(ARG_NTF_REMINDER_NTF_ID, ntfId);
+        i.putExtra(ARG_NTF_REMINDER_UUID, reminder.existingUuid);
+
+        return i;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +56,7 @@ public class MainActivity extends AppCompatActivity
         final ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         binding.viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
+        binding.viewPager.setCurrentItem(1);
         binding.tabs.setupWithViewPager(binding.viewPager, true);
 
         binding.viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -55,7 +76,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        binding.fab.setOnClickListener(view -> startFabAction(binding));
+        binding.fab.setOnClickListener(view -> startFabAction());
     }
 
     @Override
@@ -66,8 +87,38 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (PrefUtil.getRemind(this)) {
+            AlarmReceiver.setup(this);
+        }
+
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra(ARG_NTF_REMINDER_UUID)) {
+            int ntfId = intent.getIntExtra(ARG_NTF_REMINDER_NTF_ID, 0);
+            ReminderEngine.cancelNotification(this, ntfId);
+
+            String ntfReminderUuid = intent.getStringExtra(ARG_NTF_REMINDER_UUID);
+            DataStore.getReminders(this, results -> {
+                for (Reminder reminder : results) {
+                    if (!reminder.existingUuid.equals(ntfReminderUuid)) {
+                        continue;
+                    }
+
+                    mPendingNtfReminder = reminder;
+                }
+            });
+        }
+    }
+
+    @Override
     public void setCalendarFragment(CalendarFragment f) {
         mCalendarFragmentRef = new WeakReference<>(f);
+
+        if (mPendingNtfReminder != null) {
+            f.setDateFromReminder(mPendingNtfReminder);
+        }
     }
 
     @Override
@@ -95,15 +146,11 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onReminderError(Reminder reminder, Throwable error, boolean hasListeners) {
-        if (BuildConfig.DEBUG) {
-            Snackbar.make(findViewById(R.id.viewPager),
-                    String.format("%s %s %s", reminder.toString(), error.getMessage(), hasListeners),
-                    Snackbar.LENGTH_SHORT).show();
-        } else {
-            Snackbar.make(findViewById(R.id.viewPager),
-                    R.string.form_reminder_error,
-                    Snackbar.LENGTH_SHORT).show();
-        }
+        Log.d(TAG, String.format("%s %s %s", reminder.toString(), error.getMessage(), hasListeners));
+
+        Snackbar.make(findViewById(R.id.viewPager),
+                R.string.form_reminder_error,
+                Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
@@ -118,7 +165,7 @@ public class MainActivity extends AppCompatActivity
 
         int tabId = binding.viewPager.getCurrentItem();
         switch (tabId) {
-            case 0:
+            case 1:
                 if (mCalendarFragmentRef != null) {
                     CalendarFragment calendarFragment = mCalendarFragmentRef.get();
                     if (calendarFragment != null) {
@@ -126,7 +173,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
                 break;
-            case 1:
+            case 2:
                 if (mRemindersFragmentRef != null) {
                     RemindersFragment remindersFragment = mRemindersFragmentRef.get();
                     if (remindersFragment != null) {
@@ -145,16 +192,12 @@ public class MainActivity extends AppCompatActivity
         imm.hideSoftInputFromWindow(findViewById(R.id.viewPager).getWindowToken(), 0);
     }
 
-    private void startFabAction(ActivityMainBinding binding) {
-        switch (binding.viewPager.getCurrentItem()) {
-            case 0:
-                if (mCalendarFragmentRef != null) {
-                    CalendarFragment calendarFragment = mCalendarFragmentRef.get();
-                    if (calendarFragment != null) {
-                        calendarFragment.startFabAction();
-                    }
-                }
-                break;
+    private void startFabAction() {
+        if (mCalendarFragmentRef != null) {
+            CalendarFragment calendarFragment = mCalendarFragmentRef.get();
+            if (calendarFragment != null) {
+                calendarFragment.startFabAction();
+            }
         }
     }
 
@@ -166,15 +209,17 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
 
         @Override
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return CalendarFragment.newInstance();
+                    return new SettingsFragment();
                 case 1:
+                    return CalendarFragment.newInstance();
+                case 2:
                     return RemindersFragment.newInstance();
             }
 
@@ -185,8 +230,10 @@ public class MainActivity extends AppCompatActivity
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return getString(R.string.title_fragment_calendar);
+                    return getString(R.string.title_fragment_settings);
                 case 1:
+                    return getString(R.string.title_fragment_calendar);
+                case 2:
                     return getString(R.string.title_fragment_reminders);
             }
 

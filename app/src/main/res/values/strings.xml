@@ -24,9 +24,29 @@
     <string name="remind_monthly">Remind every month</string>
     <string name="remind_annually">Remind once a year</string>
     <string name="next_occurrence_in_x">\u00A0(in %s)</string>
+    <string name="next_occurrence_tomorrow">\u00A0(tomorrow)</string>
+    <string name="next_occurrence_day_after_tomorrow">\u00A0(day after tomorrow)</string>
     <string name="reminder_has_been_deleted">Reminder has been removed.</string>
     <string name="reminder_undelete">Undo</string>
-    
+    <string name="title_fragment_settings">Settings</string>
+    <string name="pref_remind">Daily Reminder</string>
+    <string name="pref_remind_how_far">How far away to remind</string>
+    <string name="pref_remind_how_far_summary">%s</string>
+    <string name="reminder_ntf_channel_name">Daily Reminder</string>
+
+    <string-array name="pref_remind_how_far">
+        <item>A day</item>
+        <item>3 days</item>
+        <item>7 days</item>
+        <item>A month (30 days)</item>
+    </string-array>
+    <string-array name="pref_remind_how_far_values">
+        <item>1</item>
+        <item>3</item>
+        <item>7</item>
+        <item>30</item>
+    </string-array>
+
     <plurals name="x_days">
         <item quantity="one">a day</item>
         <item quantity="other">%d days</item>

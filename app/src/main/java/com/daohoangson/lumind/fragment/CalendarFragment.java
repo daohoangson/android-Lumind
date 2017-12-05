@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import com.daohoangson.lumind.R;
 import com.daohoangson.lumind.databinding.FragmentCalendarBinding;
 import com.daohoangson.lumind.model.Lumindate;
+import com.daohoangson.lumind.model.Reminder;
 
 /**
  * @author sondh
@@ -98,6 +99,10 @@ public class CalendarFragment extends Fragment {
         FragmentManager fm = activity.getSupportFragmentManager();
         ReminderFragment reminderFragment = ReminderFragment.newInstance(mDate);
         reminderFragment.show(fm, reminderFragment.toString());
+    }
+
+    public void setDateFromReminder(Reminder reminder) {
+        mDate.sync(reminder.date);
     }
 
     private void updateViews() {

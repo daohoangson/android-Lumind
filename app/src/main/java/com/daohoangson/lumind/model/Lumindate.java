@@ -73,7 +73,7 @@ public class Lumindate extends BaseObservable implements Parcelable, Serializabl
         setupCallbacks();
     }
 
-    Lumindate(Parcel in) {
+    private Lumindate(Parcel in) {
         solarDay = new ObservableInt(in.readInt());
         solarMonth = new ObservableInt(in.readInt());
         solarYear = new ObservableInt(in.readInt());
