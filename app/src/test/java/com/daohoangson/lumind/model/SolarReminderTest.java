@@ -82,7 +82,7 @@ public class SolarReminderTest {
         test(yearly20160229, new int[]{1, 0, 2030}, new int[]{28, 1, 2030});
     }
 
-    Reminder create(int[] values, boolean monthly) {
+    private Reminder create(int[] values, boolean monthly) {
         Reminder reminder = new Reminder();
         reminder.setSolar(true);
         reminder.setMonthly(monthly);
@@ -90,7 +90,7 @@ public class SolarReminderTest {
         return reminder;
     }
 
-    void test(Reminder r, int[] values, int[] expected) {
+    private void test(Reminder r, int[] values, int[] expected) {
         Calendar cTest = Calendar.getInstance();
         cTest.set(Calendar.DATE, values[0]);
         cTest.set(Calendar.MONTH, values[1]);
@@ -99,11 +99,12 @@ public class SolarReminderTest {
 
         Calendar cNext = Calendar.getInstance();
         cNext.setTime(next);
-        String message = String.format(Locale.US, "[%d, %d, %d] -> [%d, %d, %d]",
+        int[] actual = new int[]{cNext.get(Calendar.DATE), cNext.get(Calendar.MONTH), cNext.get(Calendar.YEAR)};
+        String message = String.format(Locale.US, "[%d, %d, %d] expects [%d, %d, %d]",
                 values[0], values[1], values[2],
-                expected[0], values[1], values[2]);
-        assertEquals(message, expected[0], cNext.get(Calendar.DATE));
-        assertEquals(message, expected[1], cNext.get(Calendar.MONTH));
-        assertEquals(message, expected[2], cNext.get(Calendar.YEAR));
+                expected[0], expected[1], expected[2]);
+        assertEquals(message,
+                String.format(Locale.US, "[%d, %d, %d]", expected[0], expected[1], expected[2]),
+                String.format(Locale.US, "[%d, %d, %d]", actual[0], actual[1], actual[2]));
     }
 }

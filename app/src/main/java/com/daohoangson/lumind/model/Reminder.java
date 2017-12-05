@@ -183,7 +183,7 @@ public class Reminder implements Parcelable {
             if (mNextOccurrenceSince == null) {
                 mNextOccurrence = null;
             } else {
-                if (mNextOccurrenceSince.equals(since)) {
+                if (!mNextOccurrenceSince.equals(since)) {
                     mNextOccurrence = null;
                 }
             }
