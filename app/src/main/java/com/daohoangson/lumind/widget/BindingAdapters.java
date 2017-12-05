@@ -40,7 +40,7 @@ public class BindingAdapters {
         long next = nextDate.getTime();
         long durationInSec = (next - today) / 1000;
         int days = (int) Math.ceil(durationInSec / 86400.0);
-        int months = (int) Math.ceil(days / 30.0);
+        int months = (int) Math.ceil(days / 31.0);
 
         Resources r = textView.getResources();
         String txt = null;

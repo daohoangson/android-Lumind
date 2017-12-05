@@ -44,7 +44,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_toEndOf="@id/icon"
                 android:layout_toRightOf="@id/icon"
-                android:text="@{reminder.dayMonthYear}"
+                android:text="@{reminder.getDayMonthYear(context)}"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 tools:text="30 / 08 / 2006" />
 
@@ -59,7 +59,6 @@
                 android:maxLines="1"
                 android:text="@{reminder.name}"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:visibility="@{TextUtils.isEmpty(reminder.name) ? View.GONE : View.VISIBLE}"
                 tools:text="@string/form_reminder_name" />
 
             <TextView

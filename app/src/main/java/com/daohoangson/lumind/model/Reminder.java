@@ -1,5 +1,6 @@
 package com.daohoangson.lumind.model;
 
+import android.content.Context;
 import android.databinding.Observable;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
@@ -7,11 +8,13 @@ import android.databinding.ObservableInt;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.text.format.DateUtils;
 
 import com.daohoangson.lumind.R;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import de.unileipzig.informatik.duc.amlich.VietCalendar;
@@ -155,11 +158,27 @@ public class Reminder implements Parcelable {
         return monthlyOrAnnually.get() == R.id.monthly;
     }
 
-    public String getDayMonthYear() {
+    public String getDayMonthYear(Context context) {
         if (getSolar()) {
-            return String.format(Locale.US, "%02d / %02d / %04d", date.solarDay.get(), date.solarMonth.get() + 1, date.solarYear.get());
+            if (getMonthly()) {
+                return context.getString(R.string.reminder_solar_day_x, date.solarDay.get());
+            } else {
+                Calendar c = new GregorianCalendar(date.solarYear.get(), date.solarMonth.get(), date.solarDay.get());
+                return DateUtils.formatDateTime(context, c.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE);
+            }
         } else {
-            return String.format(Locale.US, "%02d / %02d / %04d", date.lunarDay.get(), date.getLunarMonth().value + 1, date.lunarYear.get());
+            if (getMonthly()) {
+                return context.getString(R.string.reminder_lunar_day_x, date.lunarDay.get());
+            } else {
+                LunarMonth lm = date.getLunarMonth();
+                Calendar c = new GregorianCalendar(date.lunarDay.get(), lm.value, date.lunarYear.get());
+                String s = DateUtils.formatDateTime(context, c.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE);
+                if (lm.leap > 0) {
+                    return context.getString(R.string.reminder_lunar_date_x_leap, s);
+                } else {
+                    return context.getString(R.string.reminder_lunar_date_x, s);
+                }
+            }
         }
     }
 
