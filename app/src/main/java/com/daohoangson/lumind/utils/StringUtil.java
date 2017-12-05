@@ -1,14 +1,43 @@
 package com.daohoangson.lumind.utils;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
+import android.text.format.DateUtils;
 
 import com.daohoangson.lumind.R;
+import com.daohoangson.lumind.model.Lumindate;
+import com.daohoangson.lumind.model.LunarMonth;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class StringUtil {
+
+    public static String formatDate(Context context, Lumindate date, boolean solar, boolean monthly) {
+        if (solar) {
+            if (monthly) {
+                return context.getString(R.string.reminder_solar_day_x, date.solarDay.get());
+            }
+
+            Calendar c = new GregorianCalendar(date.solarYear.get(), date.solarMonth.get(), date.solarDay.get());
+            return DateUtils.formatDateTime(context, c.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE);
+        }
+
+        if (monthly) {
+            return context.getString(R.string.reminder_lunar_day_x, date.lunarDay.get());
+        }
+
+        LunarMonth lm = date.getLunarMonth();
+        Calendar c = new GregorianCalendar(date.lunarDay.get(), lm.value, date.lunarYear.get());
+        String s = DateUtils.formatDateTime(context, c.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE);
+        if (lm.leap > 0) {
+            return context.getString(R.string.reminder_lunar_date_x_leap, s);
+        } else {
+            return context.getString(R.string.reminder_lunar_date_x, s);
+        }
+    }
 
     @NonNull
     public static String formatNextOccurrenceInX(Resources r, Calendar calendar, Date nextDate) {
@@ -34,7 +63,5 @@ public class StringUtil {
             default:
                 return r.getString(R.string.next_occurrence_in_x, r.getQuantityString(R.plurals.x_days, days, days));
         }
-
-
     }
 }

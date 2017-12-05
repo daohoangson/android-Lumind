@@ -14,11 +14,12 @@ import com.daohoangson.lumind.Constant;
 import com.daohoangson.lumind.MainActivity;
 import com.daohoangson.lumind.R;
 import com.daohoangson.lumind.model.DataStore;
-import com.daohoangson.lumind.model.Reminder;
+import com.daohoangson.lumind.model.Lumindate;
+import com.daohoangson.lumind.model.ReminderPersist;
+import com.daohoangson.lumind.utils.NextOccurrence;
 import com.daohoangson.lumind.utils.PrefUtil;
 import com.daohoangson.lumind.utils.StringUtil;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -32,32 +33,8 @@ public class ReminderEngine {
     private static final String TAG = "ReminderEngine";
 
     public static void remind(Context context) {
-        DataStore.getReminders(context, results -> onReminders(context, results));
-    }
-
-    public static void cancelNotification(Context context, int ntfId) {
-        NotificationManagerCompat manager = NotificationManagerCompat.from(context);
-        manager.cancel(ntfId);
-    }
-
-    private static void onReminders(Context context, List<Reminder> reminders) {
+        List<ReminderPersist> reminders = DataStore.getRemindersReadOnly(context);
         if (reminders.size() == 0) {
-            return;
-        }
-
-        Calendar at = Calendar.getInstance();
-        Calendar cutOff = (Calendar) at.clone();
-        cutOff.add(Calendar.DATE, PrefUtil.getRemindHowFar(context));
-        Date cutOffDate = cutOff.getTime();
-
-        List<Reminder> comingSoon = new ArrayList<>(reminders.size());
-        for (Reminder reminder : reminders) {
-            Date no = reminder.getNextOccurrence(at);
-            if (no.before(cutOffDate)) {
-                comingSoon.add(reminder);
-            }
-        }
-        if (comingSoon.size() == 0) {
             return;
         }
 
@@ -77,11 +54,28 @@ public class ReminderEngine {
             Log.d(TAG, "Created notification channel");
         }
 
-        for (Reminder reminder : comingSoon) {
-            String contentTitle = reminder.name.get();
-            String nextOccurrenceInX = StringUtil.formatNextOccurrenceInX(context.getResources(), at, reminder.getNextOccurrence(at));
-            String contentText = reminder.getDayMonthYear(context) + nextOccurrenceInX;
-            int ntfId = (int) (reminder.getNextOccurrence(at).getTime() / 1000 / 86400);
+        Calendar since = Calendar.getInstance();
+        Calendar cutOff = (Calendar) since.clone();
+        cutOff.add(Calendar.DATE, PrefUtil.getRemindHowFar(context));
+        Date cutOffDate = cutOff.getTime();
+
+        for (ReminderPersist reminder : reminders) {
+            if (!reminder.enabled) {
+                continue;
+            }
+
+            Lumindate date = new Lumindate(reminder.day, reminder.month, reminder.year);
+            boolean monthly = reminder.getMonthly();
+            Date no = NextOccurrence.calculate(since, date, reminder.solar, monthly);
+            if (no.after(cutOffDate)) {
+                continue;
+            }
+
+            String contentTitle = reminder.name;
+            String formattedDate = StringUtil.formatDate(context, date, reminder.solar, monthly);
+            String nextOccurrenceInX = StringUtil.formatNextOccurrenceInX(context.getResources(), since, no);
+            String contentText = formattedDate + nextOccurrenceInX;
+            int ntfId = (int) (no.getTime() / 1000 / 86400);
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, Constant.NOTIFICATION_CHANNEL_REMINDER_ID)
                     .setSmallIcon(R.mipmap.ic_launcher)
@@ -90,7 +84,7 @@ public class ReminderEngine {
 
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
             stackBuilder.addParentStack(MainActivity.class);
-            stackBuilder.addNextIntent(MainActivity.newNtfIntent(context, ntfId, reminder));
+            stackBuilder.addNextIntent(MainActivity.newNtfIntent(context, ntfId, reminder.uuid));
             PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(ntfId, PendingIntent.FLAG_UPDATE_CURRENT);
             builder.setContentIntent(resultPendingIntent);
 
@@ -98,5 +92,10 @@ public class ReminderEngine {
 
             Log.d(TAG, String.format(Locale.US, "Built notification #%d %s", ntfId, contentTitle));
         }
+    }
+
+    public static void cancelNotification(Context context, int ntfId) {
+        NotificationManagerCompat manager = NotificationManagerCompat.from(context);
+        manager.cancel(ntfId);
     }
 }

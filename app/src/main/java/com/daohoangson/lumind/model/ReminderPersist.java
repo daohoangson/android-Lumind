@@ -21,15 +21,15 @@ public class ReminderPersist extends RealmObject {
     private static final String DATA_RECURRENCE = "recurrence";
 
     @PrimaryKey
-    String uuid;
+    public String uuid;
 
-    int day;
-    int month;
-    int year;
-    boolean solar;
+    public int day;
+    public int month;
+    public int year;
+    public boolean solar;
 
-    String name;
-    boolean enabled = true;
+    public String name;
+    public boolean enabled = true;
     String data;
 
     @Ignore
@@ -97,7 +97,7 @@ public class ReminderPersist extends RealmObject {
         return null;
     }
 
-    boolean getMonthly() {
+    public boolean getMonthly() {
         return getRecurrence() == Recurrence.MONTHLY;
     }
 

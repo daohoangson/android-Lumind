@@ -75,6 +75,11 @@ public class DataStore {
         Log.d(TAG, "getReminders...");
     }
 
+    public static List<ReminderPersist> getRemindersReadOnly(Context context) {
+        RealmQuery<ReminderPersist> query = getInstance(context).where(ReminderPersist.class);
+        return query.findAll();
+    }
+
     public static void closeIfOpened() {
         if (sInstanceRef == null) {
             Log.d(TAG, "closeIfOpened no op");

@@ -41,11 +41,11 @@ public class MainActivity extends AppCompatActivity
     private WeakReference<RemindersFragment> mRemindersFragmentRef;
     private Reminder mPendingNtfReminder;
 
-    public static Intent newNtfIntent(Context context, int ntfId, Reminder reminder) {
+    public static Intent newNtfIntent(Context context, int ntfId, String uuid) {
         Intent i = new Intent(context, MainActivity.class);
 
         i.putExtra(ARG_NTF_REMINDER_NTF_ID, ntfId);
-        i.putExtra(ARG_NTF_REMINDER_UUID, reminder.existingUuid);
+        i.putExtra(ARG_NTF_REMINDER_UUID, uuid);
 
         return i;
     }
