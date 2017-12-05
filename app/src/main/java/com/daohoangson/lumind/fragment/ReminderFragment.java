@@ -93,10 +93,7 @@ public class ReminderFragment extends DialogFragment {
                 Lumindate date = args.getParcelable(ARG_DATE);
                 if (date != null) {
                     mReminder.date.sync(date);
-
-                    if (date.getLastChanged() == Lumindate.FieldGroup.LUNAR) {
-                        mReminder.solarOrLunar.set(R.id.lunar);
-                    }
+                    mReminder.setSolar(date.getLastChanged() == Lumindate.FieldGroup.SOLAR);
                 }
             } else if (args.containsKey(ARG_REMINDER)) {
                 builder.setTitle(R.string.title_fragment_reminder_edit);

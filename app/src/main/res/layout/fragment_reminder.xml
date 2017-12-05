@@ -5,6 +5,10 @@
 
     <data>
 
+        <import type="android.text.TextUtils" />
+
+        <import type="android.view.View" />
+
         <variable
             name="reminder"
             type="com.daohoangson.lumind.model.Reminder" />
@@ -69,32 +73,12 @@
                 android:text="@string/form_reminder_annually" />
         </RadioGroup>
 
-        <RadioGroup
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:checkedButton="@={reminder.solarOrLunar}"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/solar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/form_reminder_solar" />
-
-            <RadioButton
-                android:id="@+id/lunar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/form_reminder_lunar" />
-        </RadioGroup>
-
         <CheckBox
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:checked="@={reminder.enabled}"
             android:text="@string/form_reminder_enabled"
-            android:checked="@={reminder.enabled}"/>
+            android:visibility="@{TextUtils.isEmpty(reminder.existingUuid) ? View.INVISIBLE : View.VISIBLE}" />
 
     </LinearLayout>
 </layout>

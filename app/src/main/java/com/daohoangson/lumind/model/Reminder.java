@@ -23,7 +23,7 @@ public class Reminder implements Parcelable {
     public String existingUuid;
 
     public final Lumindate date = new Lumindate();
-    public final ObservableInt solarOrLunar = new ObservableInt(R.id.solar);
+    private final ObservableBoolean solar = new ObservableBoolean(true);
     public final ObservableInt monthlyOrAnnually = new ObservableInt(R.id.monthly);
     public final ObservableField<String> name = new ObservableField<>("");
     public final ObservableField<String> note = new ObservableField<>("");
@@ -89,7 +89,7 @@ public class Reminder implements Parcelable {
         };
 
         date.addOnPropertyChangedCallback(resetNextOccurrenceCallback);
-        solarOrLunar.addOnPropertyChangedCallback(resetNextOccurrenceCallback);
+        solar.addOnPropertyChangedCallback(resetNextOccurrenceCallback);
         monthlyOrAnnually.addOnPropertyChangedCallback(resetNextOccurrenceCallback);
     }
 
@@ -116,11 +116,7 @@ public class Reminder implements Parcelable {
     }
 
     public void setSolar(boolean solar) {
-        if (solar) {
-            solarOrLunar.set(R.id.solar);
-        } else {
-            solarOrLunar.set(R.id.lunar);
-        }
+        this.solar.set(solar);
     }
 
     public void setMonthly(boolean monthly) {
@@ -151,7 +147,7 @@ public class Reminder implements Parcelable {
     }
 
     public boolean getSolar() {
-        return solarOrLunar.get() == R.id.solar;
+        return solar.get();
     }
 
     public boolean getMonthly() {
