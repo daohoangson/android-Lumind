@@ -75,10 +75,6 @@ public class RemindersFragment extends Fragment {
         ItemTouchHelper touchHelper = new ItemTouchHelper(itemTouchHelperCallback);
         touchHelper.attachToRecyclerView(mBinding.list);
 
-        if (savedInstanceState == null) {
-            startRefreshing();
-        }
-
         return mBinding.getRoot();
     }
 
@@ -99,6 +95,10 @@ public class RemindersFragment extends Fragment {
     }
 
     public void startRefreshing() {
+        if (mBinding.swipeRefresh.isRefreshing()) {
+            return;
+        }
+
         mBinding.swipeRefresh.setRefreshing(true);
 
         final RecycleViewAdapter adapter = (RecycleViewAdapter) mBinding.list.getAdapter();
@@ -166,56 +166,22 @@ public class RemindersFragment extends Fragment {
         @Override
         public ReminderViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater layoutInflater = LayoutInflater.from(getContext());
-            final ListItemReminderBinding binding = ListItemReminderBinding.inflate(layoutInflater, parent, false);
-            final ReminderViewHolder vh = new ReminderViewHolder(binding);
+            ListItemReminderBinding binding = ListItemReminderBinding.inflate(layoutInflater, parent, false);
+            ReminderViewHolder vh = new ReminderViewHolder(binding);
 
             binding.getRoot().setOnClickListener(view -> {
-                final Reminder editingReminder = new Reminder();
-                editingReminder.sync(mData.get(vh.getAdapterPosition()));
-                startEditingReminder(mData.get(vh.getAdapterPosition()), (reminder, success, error) -> {
-                    if (!success) {
-                        return;
-                    }
-
-                    int position = vh.getAdapterPosition();
-                    if (position < 0 || position >= mData.size()) {
-                        return;
-                    }
-                    Reminder vhReminder = mData.get(position);
-
-                    if (!reminder.existingUuid.equals(vhReminder.existingUuid)) {
-                        startRefreshing();
-                        return;
-                    }
-
-                    mData.remove(position);
-                    mData.add(position, reminder);
-                    notifyItemChanged(position);
-                });
+                int position = vh.getAdapterPosition();
+                Reminder editing = mData.get(position);
+                onItemClick(vh, editing);
             });
 
             binding.enabled.setOnClickListener(view -> {
-                final Reminder enabledChangedReminder = new Reminder();
-                enabledChangedReminder.sync(mData.get(vh.getAdapterPosition()));
-                enabledChangedReminder.enabled.set(binding.enabled.isChecked());
-                startEditingReminder(enabledChangedReminder, (reminder, success, error) -> {
-                    if (success) {
-                        return;
-                    }
+                int position = vh.getAdapterPosition();
+                Reminder editing = new Reminder();
+                editing.sync(mData.get(position));
 
-                    int position = vh.getAdapterPosition();
-                    if (position < 0 || position >= mData.size()) {
-                        return;
-                    }
-                    Reminder vhReminder = mData.get(position);
-
-                    if (!reminder.existingUuid.equals(vhReminder.existingUuid)) {
-                        startRefreshing();
-                        return;
-                    }
-
-                    vhReminder.enabled.set(!enabledChangedReminder.enabled.get());
-                });
+                editing.enabled.set(binding.enabled.isChecked());
+                onItemClick(vh, editing);
             });
 
             return vh;
@@ -224,13 +190,40 @@ public class RemindersFragment extends Fragment {
         @Override
         public void onBindViewHolder(ReminderViewHolder holder, int position) {
             if (mData.size() > position) {
-                holder.bind(mData.get(position));
+                Reminder reminder = mData.get(position);
+
+                holder.bind(reminder);
             }
         }
 
         @Override
         public int getItemCount() {
             return mData.size();
+        }
+
+        private void onItemClick(ReminderViewHolder vh, Reminder editing) {
+            startEditingReminder(editing, (edited, success, error) -> {
+                int position = vh.getAdapterPosition();
+                if (position < 0 || position >= mData.size()) {
+                    startRefreshing();
+                    return;
+                }
+                Reminder vhReminder = mData.get(position);
+
+                if (!edited.existingUuid.equals(vhReminder.existingUuid)) {
+                    startRefreshing();
+                    return;
+                }
+
+                if (!success) {
+                    vh.bind(vhReminder);
+                    return;
+                }
+
+                mData.remove(position);
+                mData.add(position, edited);
+                vh.bind(edited);
+            });
         }
     }
 }

@@ -173,7 +173,7 @@ public class ReminderFragment extends DialogFragment {
 
     private void startSavingReminder() {
         mSaveRequested.set(true);
-        DataStore.saveEditingReminder(getContext(), mReminder, new DataStore.OnTransactionCompleteListener() {
+        DataStore.saveReminder(getContext(), mReminder, new DataStore.OnTransactionCompleteListener() {
             @Override
             public void onTransactionSuccess() {
                 mSuccess = true;

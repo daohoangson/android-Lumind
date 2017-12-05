@@ -2,9 +2,7 @@ package com.daohoangson.lumind.model;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-
-import com.daohoangson.lumind.model.Reminder;
-import com.daohoangson.lumind.model.ReminderPersist;
+import android.util.Log;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -21,27 +19,37 @@ import io.realm.RealmResults;
  */
 public class DataStore {
 
-    public static void saveEditingReminder(final Context context, final Reminder reminder, final OnTransactionCompleteListener listener) {
+    private static final String TAG = "DataStore";
+
+    public static void saveReminder(Context context, Reminder reminder, OnTransactionCompleteListener listener) {
         getInstance(context).executeTransactionAsync(
                 realm -> realm.insertOrUpdate(reminder.build()),
                 () -> {
                     if (listener != null) {
                         listener.onTransactionSuccess();
                     }
+
+                    Log.d(TAG, String.format("saveReminder OK reminder=%s", reminder));
                 }, error -> {
                     if (listener != null) {
                         listener.onTransactionError(error);
                     }
+
+                    Log.e(TAG, String.format("saveReminder failed reminder=%s, error=%s", reminder, error));
                 }
         );
     }
 
     public static void deleteReminder(Context context, final String uuid) {
         getInstance(context).executeTransactionAsync(
-                realm -> realm.where(ReminderPersist.class)
-                        .equalTo("uuid", uuid)
-                        .findAll()
-                        .deleteAllFromRealm()
+                realm -> {
+                    boolean deleted = realm.where(ReminderPersist.class)
+                            .equalTo("uuid", uuid)
+                            .findAll()
+                            .deleteAllFromRealm();
+
+                    Log.d(TAG, String.format("deleteReminder OK uuid=%s, deleted=%s", uuid, deleted));
+                }
         );
     }
 
@@ -59,17 +67,24 @@ public class DataStore {
                 listener.onResults(results);
 
                 realmResults.removeChangeListener(this);
+
+                Log.d(TAG, String.format("getReminders OK results.size=%d", results.size()));
             }
         });
+
+        Log.d(TAG, "getReminders...");
     }
 
     public static void closeIfOpened() {
         if (sInstanceRef == null) {
+            Log.d(TAG, "closeIfOpened no op");
             return;
         }
 
         sInstanceRef.get().close();
         sInstanceRef = null;
+
+        Log.d(TAG, "closeIfOpened OK");
     }
 
     public interface OnTransactionCompleteListener {
@@ -86,6 +101,7 @@ public class DataStore {
 
     private static Realm getInstance(Context context) {
         if (sInstanceRef != null) {
+            Log.d(TAG, "getInstance reused");
             return sInstanceRef.get();
         }
 
@@ -96,6 +112,7 @@ public class DataStore {
                 .build();
 
         Realm r = Realm.getInstance(realmConfig);
+        Log.d(TAG, "getInstance built");
 
         sInstanceRef = new WeakReference<>(r);
 

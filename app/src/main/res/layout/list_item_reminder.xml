@@ -104,7 +104,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:checked="@={reminder.enabled}"
+                android:checked="@{reminder.enabled}"
                 tools:checked="true" />
 
         </RelativeLayout>
