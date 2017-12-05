@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author sondh
@@ -34,6 +35,7 @@ import java.util.List;
 public class RemindersFragment extends Fragment {
 
     private FragmentRemindersBinding mBinding;
+    private AtomicBoolean mRefreshing = new AtomicBoolean(false);
 
     public static RemindersFragment newInstance() {
         return new RemindersFragment();
@@ -95,7 +97,7 @@ public class RemindersFragment extends Fragment {
     }
 
     public void startRefreshing() {
-        if (mBinding.swipeRefresh.isRefreshing()) {
+        if (!mRefreshing.compareAndSet(false, true)) {
             return;
         }
 
@@ -114,13 +116,8 @@ public class RemindersFragment extends Fragment {
             adapter.notifyItemRangeInserted(0, results.size());
 
             mBinding.swipeRefresh.setRefreshing(false);
+            mRefreshing.set(false);
         });
-
-        Handler handler = new Handler();
-        handler.postDelayed(() -> {
-            // make sure user can request another refresh if this one hangs
-            mBinding.swipeRefresh.setRefreshing(false);
-        }, 500);
     }
 
     private void startEditingReminder(Reminder reminder, ReminderFragment.OnDismissListener listener) {
