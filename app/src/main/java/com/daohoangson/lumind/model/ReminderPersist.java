@@ -13,23 +13,18 @@ import io.realm.RealmObject;
 import io.realm.annotations.Ignore;
 import io.realm.annotations.PrimaryKey;
 
-/**
- * @author sondh
- */
 public class ReminderPersist extends RealmObject {
 
-    private static final String DATA_CALENDAR_SYSTEM = "calendarSystem";
     private static final String DATA_NAME = "name";
     private static final String DATA_NOTE = "note";
     private static final String DATA_RECURRENCE = "recurrence";
 
+    @SuppressWarnings("CanBeFinal")
     @PrimaryKey
     public String uuid;
 
     public boolean enabled = true;
-    public int solarDay;
-    public int solarMonth;
-    public int solarYear;
+    public long timeInMillis;
 
     private String data;
 
@@ -68,18 +63,8 @@ public class ReminderPersist extends RealmObject {
         return (String) note;
     }
 
-    public boolean getSolar() {
-        return getCalendarSystem() == CalendarSystem.SOLAR;
-    }
-
-    ReminderPersist withCalendarSystem(CalendarSystem cs) {
-        return withData(DATA_CALENDAR_SYSTEM, cs);
-    }
-
     ReminderPersist withDate(@NonNull Lumindate date) {
-        solarDay = date.solarDay.get();
-        solarMonth = date.solarMonth.get();
-        solarYear = date.solarYear.get();
+        timeInMillis = date.getTimeInMillis();
 
         return this;
     }
@@ -101,11 +86,6 @@ public class ReminderPersist extends RealmObject {
         return withData(DATA_RECURRENCE, recurrence.name());
     }
 
-    enum CalendarSystem {
-        SOLAR,
-        LUNAR
-    }
-
     enum Recurrence {
         MONTHLY,
         ANNUALLY
@@ -125,19 +105,6 @@ public class ReminderPersist extends RealmObject {
                 mDataObj = new JSONObject();
             }
         }
-    }
-
-    @Nullable
-    private CalendarSystem getCalendarSystem() {
-        Object data = getData(DATA_CALENDAR_SYSTEM);
-        if (CalendarSystem.SOLAR.name().equals(data)) {
-            return CalendarSystem.SOLAR;
-        }
-        if (CalendarSystem.LUNAR.name().equals(data)) {
-            return CalendarSystem.LUNAR;
-        }
-
-        return null;
     }
 
     @Nullable

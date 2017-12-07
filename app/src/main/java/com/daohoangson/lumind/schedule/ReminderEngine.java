@@ -25,9 +25,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * @author sondh
- */
 public class ReminderEngine {
 
     private static final String TAG = "ReminderEngine";
@@ -64,22 +61,21 @@ public class ReminderEngine {
                 continue;
             }
 
-            Lumindate date = new Lumindate(reminder.solarDay, reminder.solarMonth, reminder.solarYear);
+            Lumindate date = new Lumindate(reminder.timeInMillis);
             boolean monthly = reminder.getMonthly();
-            boolean solar = reminder.getSolar();
-            Date no = NextOccurrence.calculate(since, date, solar, monthly);
+            Date no = NextOccurrence.lunar(since, date, monthly);
             if (no.after(cutOffDate)) {
                 continue;
             }
 
             String contentTitle = reminder.getName();
-            String formattedDate = StringUtil.formatDate(context, date, solar, monthly);
+            String formattedDate = StringUtil.formatDate(context, date, monthly);
             String nextOccurrenceInX = StringUtil.formatNextOccurrenceInX(context.getResources(), since, no);
             String contentText = formattedDate + nextOccurrenceInX;
             int ntfId = (int) (no.getTime() / 1000 / 86400);
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, Constant.NOTIFICATION_CHANNEL_REMINDER_ID)
-                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setSmallIcon(R.drawable.ic_moon_white)
                     .setContentTitle(contentTitle)
                     .setContentText(contentText);
 

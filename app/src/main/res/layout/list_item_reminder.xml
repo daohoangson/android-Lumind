@@ -35,9 +35,9 @@
                 android:layout_alignParentStart="true"
                 android:layout_marginEnd="@dimen/listItemPadding"
                 android:layout_marginRight="@dimen/listItemPadding"
-                android:contentDescription="@{reminder.solar ? @string/form_reminder_solar : @string/form_reminder_lunar}"
-                android:src="@{reminder.solar ? @drawable/ic_sun_colored : @drawable/ic_moon_colored}"
-                tools:src="@drawable/ic_sun_colored" />
+                android:contentDescription="@string/form_reminder_lunar"
+                android:src="@drawable/ic_moon_colored"
+                tools:src="@drawable/ic_moon_colored" />
 
             <TextView
                 android:id="@+id/date"

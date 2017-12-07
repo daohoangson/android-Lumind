@@ -5,9 +5,6 @@ import android.util.AttributeSet;
 
 import java.util.Calendar;
 
-/**
- * @author sondh
- */
 public class YearPicker extends LumindPicker {
     public YearPicker(Context context) {
         super(context);

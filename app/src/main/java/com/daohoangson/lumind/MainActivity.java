@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity
         mCalendarFragmentRef = new WeakReference<>(f);
 
         if (mPendingNtfReminder != null) {
-            f.setDateFromReminder(mPendingNtfReminder);
+            f.setDate(mPendingNtfReminder.date);
         }
     }
 

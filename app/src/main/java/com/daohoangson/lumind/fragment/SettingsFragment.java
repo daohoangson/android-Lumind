@@ -9,9 +9,6 @@ import com.daohoangson.lumind.R;
 import com.daohoangson.lumind.schedule.AlarmReceiver;
 import com.daohoangson.lumind.schedule.ReminderEngine;
 
-/**
- * @author sondh
- */
 public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static final String PREF_REMIND = "pref_remind";

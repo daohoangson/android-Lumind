@@ -6,11 +6,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.Assert.assertEquals;
 
-/**
- * @author sondh
- */
 public class LunarReminderTest {
 
     @Test
@@ -101,10 +98,12 @@ public class LunarReminderTest {
     }
 
     private Reminder create(int[] values, boolean monthly) {
-        Reminder reminder = new Reminder();
-        reminder.setSolar(false);
+        Lumindate date = Lumindate.getInstance();
+        date.setLunarDate(values[0], values[1], values[2]);
+
+        Reminder reminder = new Reminder(date);
         reminder.setMonthly(monthly);
-        reminder.date.setLunarDate(values[0], values[1], values[2]);
+
         return reminder;
     }
 

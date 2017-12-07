@@ -11,50 +11,7 @@ import de.unileipzig.informatik.duc.amlich.VietCalendar;
 
 public class NextOccurrence {
 
-    public static Date calculate(@NonNull Calendar since, Lumindate date, boolean solar, boolean monthly) {
-        if (solar) {
-            return solar(since, date, monthly);
-        } else {
-            return lunar(since, date, monthly);
-        }
-    }
-
-    private static Date solar(@NonNull Calendar since, Lumindate date, boolean monthly) {
-        int calendarMonth = since.get(Calendar.MONTH);
-        int calendarYear = since.get(Calendar.YEAR);
-        Date now = since.getTime();
-
-        Calendar c = (Calendar) since.clone();
-        c.set(Calendar.DATE, 1);
-        c.set(Calendar.MONTH, date.solarMonth.get());
-        c.set(Calendar.YEAR, date.solarYear.get());
-        int unit;
-
-        if (monthly) {
-            unit = Calendar.MONTH;
-            c.set(Calendar.MONTH, calendarMonth);
-            c.set(Calendar.YEAR, calendarYear);
-        } else {
-            unit = Calendar.YEAR;
-            c.set(Calendar.YEAR, calendarYear);
-        }
-
-        int solarDayInt = date.solarDay.get();
-        c.set(Calendar.DATE, Math.min(solarDayInt, c.getActualMaximum(Calendar.DAY_OF_MONTH)));
-
-        c.add(unit, -2);
-        while (!c.getTime().after(now)) {
-            c.add(unit, 1);
-        }
-
-        if (c.get(Calendar.DATE) < solarDayInt) {
-            c.set(Calendar.DATE, Math.min(solarDayInt, c.getActualMaximum(Calendar.DAY_OF_MONTH)));
-        }
-
-        return c.getTime();
-    }
-
-    private static Date lunar(@NonNull Calendar since, Lumindate date, boolean monthly) {
+    public static Date lunar(@NonNull Calendar since, Lumindate date, boolean monthly) {
         Calendar c = (Calendar) since.clone();
 
         while (true) {

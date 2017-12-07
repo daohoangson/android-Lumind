@@ -14,9 +14,6 @@ import io.realm.RealmConfiguration;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
-/**
- * @author sondh
- */
 public class DataStore {
 
     private static final String TAG = "DataStore";

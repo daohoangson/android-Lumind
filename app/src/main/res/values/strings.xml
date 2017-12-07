@@ -10,7 +10,6 @@
     <string name="form_reminder_note">Note</string>
     <string name="form_reminder_monthly">Monthly</string>
     <string name="form_reminder_annually">Annually</string>
-    <string name="form_reminder_solar">Solar</string>
     <string name="form_reminder_lunar">Lunar</string>
     <string name="form_reminder_enabled">Enabled</string>
     <string name="form_reminder_added">Reminder added!</string>
@@ -18,9 +17,8 @@
     <string name="form_reminder_error">Cannot save reminder, please try again later.</string>
     <string name="title_fragment_reminders">Reminders</string>
     <string name="reminder_lunar_day_x">Lunar day %d</string>
-    <string name="reminder_lunar_date_x">%s (lunar)</string>
-    <string name="reminder_lunar_date_x_leap">%s (lunar, leap)</string>
-    <string name="reminder_solar_day_x">Solar day %d</string>
+    <string name="reminder_lunar_date_x">%s</string>
+    <string name="reminder_lunar_date_x_leap">%s (leap)</string>
     <string name="remind_monthly">Remind every month</string>
     <string name="remind_annually">Remind once a year</string>
     <string name="next_occurrence_in_x">\u00A0(in %s)</string>

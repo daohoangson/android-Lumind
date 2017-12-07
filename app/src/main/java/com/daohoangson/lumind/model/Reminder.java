@@ -8,6 +8,7 @@ import android.databinding.ObservableInt;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.daohoangson.lumind.R;
 import com.daohoangson.lumind.utils.NextOccurrence;
@@ -20,9 +21,7 @@ public class Reminder implements Parcelable {
 
     public String existingUuid;
 
-    public final Lumindate date = new Lumindate();
-    @SuppressWarnings("WeakerAccess")
-    public final ObservableBoolean solar = new ObservableBoolean(true);
+    public final Lumindate date;
     @SuppressWarnings("WeakerAccess")
     public final ObservableInt monthlyOrAnnually = new ObservableInt(R.id.monthly);
     @SuppressWarnings("WeakerAccess")
@@ -34,18 +33,34 @@ public class Reminder implements Parcelable {
     private Calendar mNextOccurrenceSince = null;
     private Date mNextOccurrence = null;
 
-    public Reminder() {
-        setupCallbacks();
+    public Reminder(Lumindate date) {
+        this.date = new Lumindate(date);
+    }
+
+    public Reminder(Reminder other) {
+        this(other.date);
+
+        existingUuid = other.existingUuid;
+        setMonthly(other.getMonthly());
+        name.set(other.name.get());
+        note.set(other.note.get());
+        enabled.set(other.enabled.get());
     }
 
     public Reminder(ReminderPersist persist) {
-        sync(persist);
+        this(new Lumindate(persist.timeInMillis));
+
+        existingUuid = persist.uuid;
+        setMonthly(persist.getMonthly());
+        name.set(persist.getName());
+        note.set(persist.getNote());
+        enabled.set(persist.enabled);
         setupCallbacks();
     }
 
     private Reminder(Parcel in) {
-        date.sync((Lumindate) in.readParcelable(Lumindate.class.getClassLoader()));
-        solar.set(in.readInt() > 0);
+        this((Lumindate) in.readParcelable(Lumindate.class.getClassLoader()));
+
         setMonthly(in.readInt() > 0);
         name.set(in.readString());
         note.set(in.readString());
@@ -54,7 +69,6 @@ public class Reminder implements Parcelable {
         setupCallbacks();
     }
 
-    @SuppressWarnings("unused")
     public static final Creator<Reminder> CREATOR = new Creator<Reminder>() {
         @Override
         public Reminder createFromParcel(Parcel in) {
@@ -75,11 +89,31 @@ public class Reminder implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeParcelable(date, i);
-        parcel.writeInt(solar.get() ? 1 : 0);
         parcel.writeInt(getMonthly() ? 1 : 0);
         parcel.writeString(name.get());
         parcel.writeString(note.get());
         parcel.writeInt(enabled.get() ? 1 : 0);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Reminder)) {
+            return false;
+        }
+
+        Reminder other = (Reminder) obj;
+
+        return !(!TextUtils.equals(existingUuid, other.existingUuid) ||
+                !date.equals(other.date) ||
+                getMonthly() != other.getMonthly() ||
+                !TextUtils.equals(name.get(), other.name.get()) ||
+                !TextUtils.equals(note.get(), other.note.get()) ||
+                enabled.get() != other.enabled.get());
+    }
+
+    @Override
+    public String toString() {
+        return String.format("uuid=%s, date=%s, monthly=%s", existingUuid, date, getMonthly());
     }
 
     private void setupCallbacks() {
@@ -91,30 +125,7 @@ public class Reminder implements Parcelable {
         };
 
         date.addOnPropertyChangedCallback(resetNextOccurrenceCallback);
-        solar.addOnPropertyChangedCallback(resetNextOccurrenceCallback);
         monthlyOrAnnually.addOnPropertyChangedCallback(resetNextOccurrenceCallback);
-    }
-
-    public void sync(Reminder other) {
-        existingUuid = other.existingUuid;
-
-        date.sync(other.date);
-        solar.set(other.solar.get());
-        setMonthly(other.getMonthly());
-        name.set(other.name.get());
-        note.set(other.note.get());
-        enabled.set(other.enabled.get());
-    }
-
-    private void sync(ReminderPersist persist) {
-        existingUuid = persist.uuid;
-
-        date.sync(persist);
-        solar.set(persist.getSolar());
-        setMonthly(persist.getMonthly());
-        name.set(persist.getName());
-        note.set(persist.getNote());
-        enabled.set(persist.enabled);
     }
 
     public void setMonthly(boolean monthly) {
@@ -137,16 +148,11 @@ public class Reminder implements Parcelable {
                 ReminderPersist.Recurrence.MONTHLY :
                 ReminderPersist.Recurrence.ANNUALLY;
 
-        ReminderPersist.CalendarSystem cs = solar.get() ?
-                ReminderPersist.CalendarSystem.SOLAR :
-                ReminderPersist.CalendarSystem.LUNAR;
-
         return persist.withDate(date)
                 .withEnabled(enabled.get())
                 .withName(name.get())
                 .withNote(note.get())
-                .withRecurrence(recurrence)
-                .withCalendarSystem(cs);
+                .withRecurrence(recurrence);
     }
 
     private boolean getMonthly() {
@@ -154,7 +160,7 @@ public class Reminder implements Parcelable {
     }
 
     public String getDayMonthYear(Context context) {
-        return StringUtil.formatDate(context, date, solar.get(), getMonthly());
+        return StringUtil.formatDate(context, date, getMonthly());
     }
 
     public Date getNextOccurrence(@NonNull Calendar since) {
@@ -169,7 +175,7 @@ public class Reminder implements Parcelable {
         }
 
         if (mNextOccurrence == null) {
-            mNextOccurrence = NextOccurrence.calculate(since, date, solar.get(), getMonthly());
+            mNextOccurrence = NextOccurrence.lunar(since, date, getMonthly());
             mNextOccurrenceSince = (Calendar) since.clone();
         }
 

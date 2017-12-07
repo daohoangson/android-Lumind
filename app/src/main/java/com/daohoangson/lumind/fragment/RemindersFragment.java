@@ -28,9 +28,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * @author sondh
- */
 public class RemindersFragment extends Fragment {
 
     private FragmentRemindersBinding mBinding;
@@ -92,6 +89,8 @@ public class RemindersFragment extends Fragment {
     public void setActiveTab() {
         if (mBinding.list.getAdapter().getItemCount() == 0) {
             startRefreshing();
+        } else {
+            mBinding.list.getAdapter().notifyDataSetChanged();
         }
     }
 
@@ -228,11 +227,12 @@ public class RemindersFragment extends Fragment {
 
             binding.enabled.setOnClickListener(view -> {
                 int position = vh.getAdapterPosition();
-                Reminder editing = new Reminder();
-                editing.sync(mData.get(position));
+                Reminder editing = mData.get(position);
 
-                editing.enabled.set(binding.enabled.isChecked());
-                startEditingReminder(vh, editing);
+                Reminder toggled = new Reminder(editing);
+                toggled.enabled.set(binding.enabled.isChecked());
+
+                startEditingReminder(vh, toggled);
             });
 
             return vh;

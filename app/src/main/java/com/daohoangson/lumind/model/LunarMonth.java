@@ -12,9 +12,6 @@ import java.util.Map;
 
 import de.unileipzig.informatik.duc.amlich.VietCalendar;
 
-/**
- * @author sondh
- */
 public class LunarMonth {
     public static List<LunarMonth> getLunarMonths(int lunarYear, Context context, int labelStyle) {
         ArrayList<LunarMonth> months = new ArrayList<>();

@@ -15,16 +15,7 @@ import java.util.GregorianCalendar;
 
 public class StringUtil {
 
-    public static String formatDate(Context context, Lumindate date, boolean solar, boolean monthly) {
-        if (solar) {
-            if (monthly) {
-                return context.getString(R.string.reminder_solar_day_x, date.solarDay.get());
-            }
-
-            Calendar c = new GregorianCalendar(date.solarYear.get(), date.solarMonth.get(), date.solarDay.get());
-            return DateUtils.formatDateTime(context, c.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE);
-        }
-
+    public static String formatDate(Context context, Lumindate date, boolean monthly) {
         if (monthly) {
             return context.getString(R.string.reminder_lunar_day_x, date.lunarDay.get());
         }

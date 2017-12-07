@@ -7,9 +7,6 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.NumberPicker;
 
-/**
- * @author sondh
- */
 abstract public class LumindPicker extends NumberPicker {
     public LumindPicker(Context context) {
         super(context);
