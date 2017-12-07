@@ -5,13 +5,12 @@ import android.support.annotation.NonNull;
 import com.daohoangson.lumind.model.Lumindate;
 
 import java.util.Calendar;
-import java.util.Date;
 
 import de.unileipzig.informatik.duc.amlich.VietCalendar;
 
 public class NextOccurrence {
 
-    public static Date lunar(@NonNull Calendar since, Lumindate date, boolean monthly) {
+    public static Calendar lunar(@NonNull Calendar since, Lumindate date, boolean monthly) {
         Calendar c = (Calendar) since.clone();
 
         while (true) {
@@ -26,11 +25,11 @@ public class NextOccurrence {
 
             if (monthly) {
                 if (tmpLunar[0] == dayToCompare) {
-                    return c.getTime();
+                    return c;
                 }
             } else {
                 if (tmpLunar[0] == dayToCompare && tmpLunar[1] == date.getLunarMonth().value + 1) {
-                    return c.getTime();
+                    return c;
                 }
             }
         }

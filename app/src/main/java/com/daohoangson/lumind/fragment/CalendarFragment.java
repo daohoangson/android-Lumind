@@ -23,6 +23,7 @@ import com.daohoangson.lumind.model.Lumindate;
 public class CalendarFragment extends Fragment {
     private static final String STATE_DATE = "date";
 
+    public final Lumindate mDate = Lumindate.getInstance();
     private FragmentCalendarBinding mBinding;
 
     public static CalendarFragment newInstance() {
@@ -36,9 +37,23 @@ public class CalendarFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mDate.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                updateViews();
+            }
+        });
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBinding = FragmentCalendarBinding.inflate(inflater, container, false);
-        setDate(Lumindate.getInstance());
+        mBinding.setDate(mDate);
+
+        updateViews();
 
         return mBinding.getRoot();
     }
@@ -53,7 +68,6 @@ public class CalendarFragment extends Fragment {
         }
     }
 
-
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
@@ -61,7 +75,7 @@ public class CalendarFragment extends Fragment {
         if (savedInstanceState != null) {
             Lumindate date = savedInstanceState.getParcelable(STATE_DATE);
             if (date != null) {
-                setDate(date);
+                mDate.setTimeInMillis(date.getTimeInMillis());
             }
         }
     }
@@ -80,19 +94,6 @@ public class CalendarFragment extends Fragment {
         updateFab(callerActivity.getFab());
     }
 
-    public void setDate(@NonNull Lumindate date) {
-        mBinding.setDate(date);
-
-        date.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
-            @Override
-            public void onPropertyChanged(Observable observable, int i) {
-                updateViews();
-            }
-        });
-
-        updateViews();
-    }
-
     public void startFabAction() {
         FragmentActivity activity = getActivity();
         if (activity == null) {
@@ -105,11 +106,14 @@ public class CalendarFragment extends Fragment {
     }
 
     private void updateViews() {
-        Lumindate date = mBinding.getDate();
+        if (mBinding == null) {
+            return;
+        }
+
         ImageView arrow = mBinding.arrow;
         int resDrawable = 0;
         int resDescription = 0;
-        switch (date.getLastChanged()) {
+        switch (mDate.getLastChanged()) {
             case SOLAR:
                 resDrawable = R.drawable.ic_solar2lunar;
                 resDescription = R.string.solar_to_lunar;

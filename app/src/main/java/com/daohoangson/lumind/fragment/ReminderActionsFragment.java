@@ -17,6 +17,7 @@ public class ReminderActionsFragment extends DialogFragment {
     private final Set<OnDismissListener> mListeners = new HashSet<>();
 
     public enum Action {
+        VIEW,
         EDIT,
         DELETE
     }
@@ -46,6 +47,9 @@ public class ReminderActionsFragment extends DialogFragment {
                     String code = codes[which];
 
                     switch (code) {
+                        case "view":
+                            pingListeners(Action.VIEW);
+                            break;
                         case "edit":
                             pingListeners(Action.EDIT);
                             break;

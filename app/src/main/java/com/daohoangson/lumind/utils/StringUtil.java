@@ -10,7 +10,6 @@ import com.daohoangson.lumind.model.Lumindate;
 import com.daohoangson.lumind.model.LunarMonth;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 public class StringUtil {
@@ -31,10 +30,10 @@ public class StringUtil {
     }
 
     @NonNull
-    public static String formatNextOccurrenceInX(Resources r, Calendar calendar, Date nextDate) {
-        long today = calendar.getTimeInMillis();
-        long next = nextDate.getTime();
-        long durationInSec = (next - today) / 1000;
+    public static String formatNextOccurrenceInX(Resources r, Calendar since, Calendar next) {
+        long tSince = since.getTimeInMillis();
+        long tNext = next.getTimeInMillis();
+        long durationInSec = (tNext - tSince) / 1000;
         int days = (int) Math.ceil(durationInSec / 86400.0);
         int months = (int) Math.ceil(days / 31.0);
 

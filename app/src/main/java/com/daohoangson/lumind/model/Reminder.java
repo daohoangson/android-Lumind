@@ -15,7 +15,6 @@ import com.daohoangson.lumind.utils.NextOccurrence;
 import com.daohoangson.lumind.utils.StringUtil;
 
 import java.util.Calendar;
-import java.util.Date;
 
 public class Reminder implements Parcelable {
 
@@ -31,7 +30,7 @@ public class Reminder implements Parcelable {
     public final ObservableBoolean enabled = new ObservableBoolean(true);
 
     private Calendar mNextOccurrenceSince = null;
-    private Date mNextOccurrence = null;
+    private Calendar mNextOccurrence = null;
 
     public Reminder(Lumindate date) {
         this.date = new Lumindate(date);
@@ -163,7 +162,7 @@ public class Reminder implements Parcelable {
         return StringUtil.formatDate(context, date, getMonthly());
     }
 
-    public Date getNextOccurrence(@NonNull Calendar since) {
+    public Calendar getNextOccurrence(@NonNull Calendar since) {
         if (mNextOccurrence != null) {
             if (mNextOccurrenceSince == null) {
                 mNextOccurrence = null;

@@ -20,13 +20,13 @@ import de.unileipzig.informatik.duc.amlich.VietCalendar;
 public class Lumindate extends BaseObservable implements Parcelable {
 
     @SuppressWarnings("WeakerAccess")
-    public final ObservableInt solarDay;
-    public final ObservableInt solarMonth;
-    public final ObservableInt solarYear;
-    public final ObservableInt lunarDay;
+    public final ObservableInt solarDay = new ObservableInt(0);
+    public final ObservableInt solarMonth = new ObservableInt(0);
+    public final ObservableInt solarYear = new ObservableInt(0);
+    public final ObservableInt lunarDay = new ObservableInt(0);
     @SuppressWarnings("WeakerAccess")
-    public final ObservableInt lunarMonthRaw;
-    public final ObservableInt lunarYear;
+    public final ObservableInt lunarMonthRaw = new ObservableInt(0);
+    public final ObservableInt lunarYear = new ObservableInt(0);
 
     private final AtomicBoolean mCorrectnessGuarantee = new AtomicBoolean(true);
     private FieldGroup mLastChanged = FieldGroup.SOLAR;
@@ -36,16 +36,7 @@ public class Lumindate extends BaseObservable implements Parcelable {
     }
 
     public Lumindate(long timeInMillis) {
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(timeInMillis);
-
-        solarDay = new ObservableInt(c.get(Calendar.DATE));
-        solarMonth = new ObservableInt(c.get(Calendar.MONTH));
-        solarYear = new ObservableInt(c.get(Calendar.YEAR));
-        lunarDay = new ObservableInt(0);
-        lunarMonthRaw = new ObservableInt(0);
-        lunarYear = new ObservableInt(0);
-
+        setTimeInMillis(timeInMillis);
         calculateLunar();
         setupCallbacks();
     }
@@ -101,7 +92,7 @@ public class Lumindate extends BaseObservable implements Parcelable {
         return mLastChanged;
     }
 
-    long getTimeInMillis() {
+    public long getTimeInMillis() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.DATE, solarDay.get());
         calendar.set(Calendar.MONTH, solarMonth.get());
@@ -135,6 +126,22 @@ public class Lumindate extends BaseObservable implements Parcelable {
 
         validateLunarValues();
         calculateSolar();
+
+        mCorrectnessGuarantee.set(flag);
+    }
+
+    public void setTimeInMillis(long timeInMillis) {
+        boolean flag = mCorrectnessGuarantee.getAndSet(false);
+
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(timeInMillis);
+
+        solarDay.set(c.get(Calendar.DATE));
+        solarMonth.set(c.get(Calendar.MONTH));
+        solarYear.set(c.get(Calendar.YEAR));
+
+        validateSolarValues();
+        calculateLunar();
 
         mCorrectnessGuarantee.set(flag);
     }

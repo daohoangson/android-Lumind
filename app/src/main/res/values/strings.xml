@@ -33,10 +33,12 @@
     <string name="reminder_ntf_channel_name">Daily Reminder</string>
 
     <string-array name="reminder_action_codes">
+        <item>view</item>
         <item>edit</item>
         <item>delete</item>
     </string-array>
     <string-array name="reminder_actions">
+        <item>View in calendar</item>
         <item>Edit</item>
         <item>Delete</item>
     </string-array>

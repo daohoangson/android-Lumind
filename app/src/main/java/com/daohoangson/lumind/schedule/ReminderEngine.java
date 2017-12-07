@@ -63,7 +63,7 @@ public class ReminderEngine {
 
             Lumindate date = new Lumindate(reminder.timeInMillis);
             boolean monthly = reminder.getMonthly();
-            Date no = NextOccurrence.lunar(since, date, monthly);
+            Calendar no = NextOccurrence.lunar(since, date, monthly);
             if (no.after(cutOffDate)) {
                 continue;
             }
@@ -72,7 +72,7 @@ public class ReminderEngine {
             String formattedDate = StringUtil.formatDate(context, date, monthly);
             String nextOccurrenceInX = StringUtil.formatNextOccurrenceInX(context.getResources(), since, no);
             String contentText = formattedDate + nextOccurrenceInX;
-            int ntfId = (int) (no.getTime() / 1000 / 86400);
+            int ntfId = (int) (no.getTimeInMillis() / 1000 / 86400);
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, Constant.NOTIFICATION_CHANNEL_REMINDER_ID)
                     .setSmallIcon(R.drawable.ic_moon_white)

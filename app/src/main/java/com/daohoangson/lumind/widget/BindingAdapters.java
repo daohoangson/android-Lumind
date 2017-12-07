@@ -4,12 +4,11 @@ import android.databinding.BindingAdapter;
 import android.databinding.Observable;
 import android.widget.TextView;
 
-import com.daohoangson.lumind.utils.StringUtil;
 import com.daohoangson.lumind.model.Lumindate;
 import com.daohoangson.lumind.model.Reminder;
+import com.daohoangson.lumind.utils.StringUtil;
 
 import java.util.Calendar;
-import java.util.Date;
 
 @SuppressWarnings("WeakerAccess")
 public class BindingAdapters {
@@ -30,9 +29,9 @@ public class BindingAdapters {
 
     @BindingAdapter("next_occurrence_text")
     public static void bindNextOccurrenceToTextView(TextView textView, Reminder reminder) {
-        Calendar calendar = Calendar.getInstance();
-        Date nextDate = reminder.getNextOccurrence(calendar);
-        String txt = StringUtil.formatNextOccurrenceInX(textView.getResources(), calendar, nextDate);
+        Calendar since = Calendar.getInstance();
+        Calendar next = reminder.getNextOccurrence(since);
+        String txt = StringUtil.formatNextOccurrenceInX(textView.getResources(), since, next);
 
         textView.setText(txt);
     }

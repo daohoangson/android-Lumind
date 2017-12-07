@@ -3,7 +3,6 @@ package com.daohoangson.lumind.model;
 import org.junit.Test;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 import static junit.framework.Assert.assertEquals;
@@ -108,15 +107,13 @@ public class LunarReminderTest {
     }
 
     private void test(Reminder r, int[] values, int[] expected) {
-        Calendar cTest = Calendar.getInstance();
-        cTest.set(Calendar.DATE, values[0]);
-        cTest.set(Calendar.MONTH, values[1]);
-        cTest.set(Calendar.YEAR, values[2]);
-        Date next = r.getNextOccurrence(cTest);
+        Calendar since = Calendar.getInstance();
+        since.set(Calendar.DATE, values[0]);
+        since.set(Calendar.MONTH, values[1]);
+        since.set(Calendar.YEAR, values[2]);
+        Calendar next = r.getNextOccurrence(since);
 
-        Calendar cNext = Calendar.getInstance();
-        cNext.setTime(next);
-        int[] actual = new int[]{cNext.get(Calendar.DATE), cNext.get(Calendar.MONTH), cNext.get(Calendar.YEAR)};
+        int[] actual = new int[]{next.get(Calendar.DATE), next.get(Calendar.MONTH), next.get(Calendar.YEAR)};
 
         String message = String.format(Locale.US, "[%d, %d, %d] expects [%d, %d, %d]",
                 values[0], values[1], values[2],

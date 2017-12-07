@@ -21,12 +21,14 @@ import com.daohoangson.lumind.fragment.ReminderFragment;
 import com.daohoangson.lumind.fragment.RemindersFragment;
 import com.daohoangson.lumind.fragment.SettingsFragment;
 import com.daohoangson.lumind.model.DataStore;
+import com.daohoangson.lumind.model.Lumindate;
 import com.daohoangson.lumind.model.Reminder;
 import com.daohoangson.lumind.schedule.AlarmReceiver;
 import com.daohoangson.lumind.schedule.ReminderEngine;
 import com.daohoangson.lumind.utils.PrefUtil;
 
 import java.lang.ref.WeakReference;
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity
         implements CalendarFragment.CallerActivity,
@@ -35,8 +37,12 @@ public class MainActivity extends AppCompatActivity
 
     private static final String ARG_NTF_REMINDER_NTF_ID = "ntfReminderNtfId";
     private static final String ARG_NTF_REMINDER_UUID = "ntfReminderUuid";
+    private static final int PAGER_ITEM_CALENDAR = 0;
+    private static final int PAGER_ITEM_REMINDERS = 1;
+    private static final int PAGER_ITEM_SETTINGS = 2;
     private static final String TAG = "MainActivity";
 
+    private ActivityMainBinding mBinding;
     private WeakReference<CalendarFragment> mCalendarFragmentRef;
     private WeakReference<RemindersFragment> mRemindersFragmentRef;
     private Reminder mPendingNtfReminder;
@@ -53,12 +59,12 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        binding.viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
-        binding.tabs.setupWithViewPager(binding.viewPager, true);
+        mBinding.viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
+        mBinding.tabs.setupWithViewPager(mBinding.viewPager, true);
 
-        binding.viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        mBinding.viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 // intentionally left blank
@@ -66,7 +72,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onPageSelected(int position) {
-                resetViews(binding);
+                resetViews();
             }
 
             @Override
@@ -75,7 +81,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        binding.fab.setOnClickListener(view -> startFabAction());
+        mBinding.fab.setOnClickListener(view -> startFabAction());
     }
 
     @Override
@@ -116,7 +122,9 @@ public class MainActivity extends AppCompatActivity
         mCalendarFragmentRef = new WeakReference<>(f);
 
         if (mPendingNtfReminder != null) {
-            f.setDate(mPendingNtfReminder.date);
+            Calendar since = Calendar.getInstance();
+            Calendar no = mPendingNtfReminder.getNextOccurrence(since);
+            mCalendarFragmentRef.get().mDate.setTimeInMillis(no.getTimeInMillis());
         }
     }
 
@@ -153,16 +161,26 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void setCalendarDate(Lumindate date) {
+        if (mCalendarFragmentRef == null) {
+            return;
+        }
+
+        mBinding.viewPager.setCurrentItem(PAGER_ITEM_CALENDAR);
+        mCalendarFragmentRef.get().mDate.setTimeInMillis(date.getTimeInMillis());
+    }
+
+    @Override
     public void setRemindersFragment(RemindersFragment f) {
         mRemindersFragmentRef = new WeakReference<>(f);
     }
 
-    private void resetViews(ActivityMainBinding binding) {
-        binding.fab.setVisibility(View.GONE);
+    private void resetViews() {
+        mBinding.fab.setVisibility(View.GONE);
 
         hideSoftKeyboard();
 
-        int tabId = binding.viewPager.getCurrentItem();
+        int tabId = mBinding.viewPager.getCurrentItem();
         switch (tabId) {
             case 0:
                 if (mCalendarFragmentRef != null) {
@@ -214,11 +232,11 @@ public class MainActivity extends AppCompatActivity
         @Override
         public Fragment getItem(int position) {
             switch (position) {
-                case 0:
+                case PAGER_ITEM_CALENDAR:
                     return CalendarFragment.newInstance();
-                case 1:
+                case PAGER_ITEM_REMINDERS:
                     return RemindersFragment.newInstance();
-                case 2:
+                case PAGER_ITEM_SETTINGS:
                     return new SettingsFragment();
             }
 
@@ -228,11 +246,11 @@ public class MainActivity extends AppCompatActivity
         @Override
         public CharSequence getPageTitle(int position) {
             switch (position) {
-                case 0:
+                case PAGER_ITEM_CALENDAR:
                     return getString(R.string.title_fragment_calendar);
-                case 1:
+                case PAGER_ITEM_REMINDERS:
                     return getString(R.string.title_fragment_reminders);
-                case 2:
+                case PAGER_ITEM_SETTINGS:
                     return getString(R.string.title_fragment_settings);
             }
 

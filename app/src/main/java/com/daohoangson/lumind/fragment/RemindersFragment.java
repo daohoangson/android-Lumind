@@ -19,6 +19,7 @@ import com.daohoangson.lumind.R;
 import com.daohoangson.lumind.databinding.FragmentRemindersBinding;
 import com.daohoangson.lumind.databinding.ListItemReminderBinding;
 import com.daohoangson.lumind.model.DataStore;
+import com.daohoangson.lumind.model.Lumindate;
 import com.daohoangson.lumind.model.Reminder;
 import com.daohoangson.lumind.widget.holder.ReminderViewHolder;
 
@@ -38,6 +39,8 @@ public class RemindersFragment extends Fragment {
     }
 
     public interface CallerActivity {
+        void setCalendarDate(Lumindate date);
+
         void setRemindersFragment(RemindersFragment f);
     }
 
@@ -118,6 +121,20 @@ public class RemindersFragment extends Fragment {
         });
     }
 
+    private void startViewingReminder(ReminderViewHolder vh) {
+        RecycleViewAdapter adapter = (RecycleViewAdapter) mBinding.list.getAdapter();
+        int position = vh.getAdapterPosition();
+        Reminder reminder = adapter.mData.get(position);
+
+        Activity activity = getActivity();
+        if (activity instanceof CallerActivity) {
+            Calendar c = Calendar.getInstance();
+            Calendar no = reminder.getNextOccurrence(c);
+            Lumindate date = new Lumindate(no.getTimeInMillis());
+            ((CallerActivity) activity).setCalendarDate(date);
+        }
+    }
+
     private void startEditingReminder(ReminderViewHolder vh, Reminder reminder) {
         FragmentActivity activity = getActivity();
         if (activity == null) {
@@ -193,11 +210,7 @@ public class RemindersFragment extends Fragment {
             ReminderViewHolder vh = new ReminderViewHolder(binding);
             View root = binding.getRoot();
 
-            root.setOnClickListener(view -> {
-                int position = vh.getAdapterPosition();
-                Reminder editing = mData.get(position);
-                startEditingReminder(vh, editing);
-            });
+            root.setOnClickListener(view -> startViewingReminder(vh));
 
             root.setOnLongClickListener(view -> {
                 FragmentActivity activity = getActivity();
@@ -213,6 +226,9 @@ public class RemindersFragment extends Fragment {
 
                 f.addOnDismissListener(action -> {
                     switch (action) {
+                        case VIEW:
+                            startViewingReminder(vh);
+                            break;
                         case EDIT:
                             startEditingReminder(vh, focusing);
                             break;
