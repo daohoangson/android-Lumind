@@ -163,7 +163,7 @@ public class ReminderFragment extends DialogFragment {
         outState.putParcelable(STATE_REMINDER, mReminder);
     }
 
-    public void addOnResultListener(OnDismissListener listener) {
+    public void addOnDismissListener(OnDismissListener listener) {
         if (listener == null) {
             return;
         }

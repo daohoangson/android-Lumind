@@ -34,6 +34,14 @@
     <string name="pref_remind_how_far_summary">%s</string>
     <string name="reminder_ntf_channel_name">Daily Reminder</string>
 
+    <string-array name="reminder_action_codes">
+        <item>edit</item>
+        <item>delete</item>
+    </string-array>
+    <string-array name="reminder_actions">
+        <item>Edit</item>
+        <item>Delete</item>
+    </string-array>
     <string-array name="pref_remind_how_far">
         <item>A day</item>
         <item>3 days</item>
