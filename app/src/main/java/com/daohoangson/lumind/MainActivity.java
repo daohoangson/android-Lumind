@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity
         final ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         binding.viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
-        binding.viewPager.setCurrentItem(1);
         binding.tabs.setupWithViewPager(binding.viewPager, true);
 
         binding.viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -165,7 +164,7 @@ public class MainActivity extends AppCompatActivity
 
         int tabId = binding.viewPager.getCurrentItem();
         switch (tabId) {
-            case 1:
+            case 0:
                 if (mCalendarFragmentRef != null) {
                     CalendarFragment calendarFragment = mCalendarFragmentRef.get();
                     if (calendarFragment != null) {
@@ -173,7 +172,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
                 break;
-            case 2:
+            case 1:
                 if (mRemindersFragmentRef != null) {
                     RemindersFragment remindersFragment = mRemindersFragmentRef.get();
                     if (remindersFragment != null) {
@@ -216,11 +215,11 @@ public class MainActivity extends AppCompatActivity
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return new SettingsFragment();
-                case 1:
                     return CalendarFragment.newInstance();
-                case 2:
+                case 1:
                     return RemindersFragment.newInstance();
+                case 2:
+                    return new SettingsFragment();
             }
 
             return null;
@@ -230,11 +229,11 @@ public class MainActivity extends AppCompatActivity
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return getString(R.string.title_fragment_settings);
-                case 1:
                     return getString(R.string.title_fragment_calendar);
-                case 2:
+                case 1:
                     return getString(R.string.title_fragment_reminders);
+                case 2:
+                    return getString(R.string.title_fragment_settings);
             }
 
             return super.getPageTitle(position);
