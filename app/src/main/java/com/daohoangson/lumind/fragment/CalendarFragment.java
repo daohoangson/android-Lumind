@@ -24,7 +24,6 @@ public class CalendarFragment extends Fragment {
     private static final String STATE_DATE = "date";
 
     public final Lumindate mDate = Lumindate.getInstance();
-    private FragmentCalendarBinding mBinding;
 
     public static CalendarFragment newInstance() {
         return new CalendarFragment();
@@ -37,25 +36,20 @@ public class CalendarFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        FragmentCalendarBinding binding = FragmentCalendarBinding.inflate(inflater, container, false);
+        binding.setDate(mDate);
 
         mDate.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable observable, int i) {
-                updateViews();
+                updateViews(binding);
             }
         });
-    }
 
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mBinding = FragmentCalendarBinding.inflate(inflater, container, false);
-        mBinding.setDate(mDate);
+        updateViews(binding);
 
-        updateViews();
-
-        return mBinding.getRoot();
+        return binding.getRoot();
     }
 
     @Override
@@ -84,10 +78,7 @@ public class CalendarFragment extends Fragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        Lumindate date = mBinding.getDate();
-        if (date != null) {
-            outState.putParcelable(STATE_DATE, date);
-        }
+        outState.putParcelable(STATE_DATE, mDate);
     }
 
     public void setActiveTab(CallerActivity callerActivity) {
@@ -101,16 +92,16 @@ public class CalendarFragment extends Fragment {
         }
 
         FragmentManager fm = activity.getSupportFragmentManager();
-        ReminderFragment reminderFragment = ReminderFragment.newInstance(mBinding.getDate());
+        ReminderFragment reminderFragment = ReminderFragment.newInstance(mDate);
         reminderFragment.show(fm, reminderFragment.toString());
     }
 
-    private void updateViews() {
-        if (mBinding == null) {
+    private void updateViews(FragmentCalendarBinding binding) {
+        if (binding == null) {
             return;
         }
 
-        ImageView arrow = mBinding.arrow;
+        ImageView arrow = binding.arrow;
         int resDrawable = 0;
         int resDescription = 0;
         switch (mDate.getLastChanged()) {

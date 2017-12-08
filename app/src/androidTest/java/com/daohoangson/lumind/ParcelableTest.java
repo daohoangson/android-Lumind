@@ -51,11 +51,11 @@ public class ParcelableTest {
     @Test
     public void testReminderExistingUuid() {
         final String uuid = UUID.randomUUID().toString();
-        ReminderPersist persist = new ReminderPersist(uuid);
-        Reminder reminder1 = new Reminder(persist);
+        Reminder reminder1 = new Reminder(Lumindate.getInstance());
+        reminder1.uuid = uuid;
         Reminder reminder2 = doIt(reminder1, Reminder.CREATOR);
 
-        assertEquals(true, reminder2.isSameUuid(uuid));
+        assertEquals(uuid, reminder2.uuid);
     }
 
     @Test
@@ -66,23 +66,23 @@ public class ParcelableTest {
         Reminder reminder1 = new Reminder(date);
         Reminder reminder2 = doIt(reminder1, Reminder.CREATOR);
 
-        assertEquals(date.getTimeInMillis(), reminder2.getTimeInMillis());
+        assertEquals(date.getTimeInMillis(), reminder2.date.getTimeInMillis());
     }
 
     @Test
     public void testReminderType() {
         final ReminderPersist.Type typeVesak = ReminderPersist.Type.VESAK;
-        ReminderPersist persist = new ReminderPersist().with(typeVesak);
-        Reminder reminder1 = new Reminder(persist);
+        Reminder reminder1 = new Reminder(Lumindate.getInstance());
+        reminder1.type = typeVesak;
         Reminder reminder2 = doIt(reminder1, Reminder.CREATOR);
 
-        assertEquals(typeVesak, reminder2.getType());
+        assertEquals(typeVesak, reminder2.type);
     }
 
     @Test
     public void testReminderMonthly() {
-        ReminderPersist persist = new ReminderPersist().with(ReminderPersist.Recurrence.MONTHLY);
-        Reminder reminder1 = new Reminder(persist);
+        Reminder reminder1 = new Reminder(Lumindate.getInstance());
+        reminder1.monthlyOrAnnually.set(R.id.monthly);
         Reminder reminder2 = doIt(reminder1, Reminder.CREATOR);
 
         assertEquals(true, reminder2.getMonthly());
@@ -90,8 +90,8 @@ public class ParcelableTest {
 
     @Test
     public void testReminderAnnually() {
-        ReminderPersist persist = new ReminderPersist().with(ReminderPersist.Recurrence.ANNUALLY);
-        Reminder reminder1 = new Reminder(persist);
+        Reminder reminder1 = new Reminder(Lumindate.getInstance());
+        reminder1.monthlyOrAnnually.set(R.id.annually);
         Reminder reminder2 = doIt(reminder1, Reminder.CREATOR);
 
         assertEquals(false, reminder2.getMonthly());

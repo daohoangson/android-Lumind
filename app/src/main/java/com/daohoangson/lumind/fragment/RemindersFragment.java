@@ -31,8 +31,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RemindersFragment extends Fragment {
 
-    private FragmentRemindersBinding mBinding;
+    private final RecycleViewAdapter mAdapter = new RecycleViewAdapter();
     private final AtomicBoolean mRefreshing = new AtomicBoolean(false);
+    private RefreshingCapable mRefreshingCapable;
 
     public static RemindersFragment newInstance() {
         return new RemindersFragment();
@@ -44,17 +45,18 @@ public class RemindersFragment extends Fragment {
         void setRemindersFragment(RemindersFragment f);
     }
 
+    public interface RefreshingCapable {
+        void setRefreshing(boolean refreshing);
+    }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mBinding = FragmentRemindersBinding.inflate(inflater, container, false);
-        mBinding.list.setHasFixedSize(true);
+        FragmentRemindersBinding binding = FragmentRemindersBinding.inflate(inflater, container, false);
+        binding.list.setHasFixedSize(true);
+        binding.list.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.list.setAdapter(mAdapter);
 
-        mBinding.list.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        RecycleViewAdapter adapter = new RecycleViewAdapter();
-        mBinding.list.setAdapter(adapter);
-
-        mBinding.swipeRefresh.setOnRefreshListener(this::startRefreshing);
+        binding.swipeRefresh.setOnRefreshListener(this::startRefreshing);
 
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
 
@@ -74,9 +76,11 @@ public class RemindersFragment extends Fragment {
             }
         };
         ItemTouchHelper touchHelper = new ItemTouchHelper(itemTouchHelperCallback);
-        touchHelper.attachToRecyclerView(mBinding.list);
+        touchHelper.attachToRecyclerView(binding.list);
 
-        return mBinding.getRoot();
+        mRefreshingCapable = binding.swipeRefresh::setRefreshing;
+
+        return binding.getRoot();
     }
 
     @Override
@@ -90,10 +94,10 @@ public class RemindersFragment extends Fragment {
     }
 
     public void setActiveTab() {
-        if (mBinding.list.getAdapter().getItemCount() == 0) {
+        if (mAdapter.getItemCount() == 0) {
             startRefreshing();
         } else {
-            mBinding.list.getAdapter().notifyDataSetChanged();
+            mAdapter.notifyDataSetChanged();
         }
     }
 
@@ -102,29 +106,31 @@ public class RemindersFragment extends Fragment {
             return;
         }
 
-        mBinding.swipeRefresh.setRefreshing(true);
+        if (mRefreshingCapable != null) {
+            mRefreshingCapable.setRefreshing(true);
+        }
 
-        RecycleViewAdapter adapter = (RecycleViewAdapter) mBinding.list.getAdapter();
-        int oldItemCount = adapter.mData.size();
-        adapter.mData.clear();
-        adapter.notifyItemRangeRemoved(0, oldItemCount);
+        int oldItemCount = mAdapter.data.size();
+        mAdapter.data.clear();
+        mAdapter.notifyItemRangeRemoved(0, oldItemCount);
 
         DataStore.getReminders(getContext(), results -> {
             Calendar calendar = Calendar.getInstance();
             Collections.sort(results, (reminder, t1) -> reminder.getNextOccurrence(calendar).compareTo(t1.getNextOccurrence(calendar)));
 
-            adapter.mData.addAll(results);
-            adapter.notifyItemRangeInserted(0, results.size());
+            mAdapter.data.addAll(results);
+            mAdapter.notifyItemRangeInserted(0, results.size());
 
-            mBinding.swipeRefresh.setRefreshing(false);
+            if (mRefreshingCapable != null) {
+                mRefreshingCapable.setRefreshing(false);
+            }
             mRefreshing.set(false);
         });
     }
 
     private void startViewingReminder(ReminderViewHolder vh) {
-        RecycleViewAdapter adapter = (RecycleViewAdapter) mBinding.list.getAdapter();
         int position = vh.getAdapterPosition();
-        Reminder reminder = adapter.mData.get(position);
+        Reminder reminder = mAdapter.data.get(position);
 
         Activity activity = getActivity();
         if (activity instanceof CallerActivity) {
@@ -144,15 +150,14 @@ public class RemindersFragment extends Fragment {
         FragmentManager fm = activity.getSupportFragmentManager();
         ReminderFragment reminderFragment = ReminderFragment.newInstance(reminder);
         reminderFragment.addOnDismissListener((edited, success, error) -> {
-            RecycleViewAdapter adapter = (RecycleViewAdapter) mBinding.list.getAdapter();
             int position = vh.getAdapterPosition();
-            if (position < 0 || position >= adapter.mData.size()) {
+            if (position < 0 || position >= mAdapter.data.size()) {
                 startRefreshing();
                 return;
             }
 
-            Reminder vhReminder = adapter.mData.get(position);
-            if (!vhReminder.isSameUuid(edited)) {
+            Reminder vhReminder = mAdapter.data.get(position);
+            if (!vhReminder.uuid.equals(edited.uuid)) {
                 startRefreshing();
                 return;
             }
@@ -162,8 +167,8 @@ public class RemindersFragment extends Fragment {
                 return;
             }
 
-            adapter.mData.remove(position);
-            adapter.mData.add(position, edited);
+            mAdapter.data.remove(position);
+            mAdapter.data.add(position, edited);
             vh.bind(edited);
         });
 
@@ -171,20 +176,24 @@ public class RemindersFragment extends Fragment {
     }
 
     private void startDeletingReminder(ReminderViewHolder vh) {
-        RecycleViewAdapter adapter = (RecycleViewAdapter) mBinding.list.getAdapter();
         int position = vh.getAdapterPosition();
-        if (position < 0 || position >= adapter.mData.size()) {
+        if (position < 0 || position >= mAdapter.data.size()) {
             startRefreshing();
             return;
         }
 
-        Reminder reminder = adapter.mData.remove(position);
-        adapter.notifyItemRemoved(position);
+        Reminder reminder = mAdapter.data.remove(position);
+        mAdapter.notifyItemRemoved(position);
 
-        Snackbar.make(mBinding.list, R.string.reminder_has_been_deleted, Snackbar.LENGTH_LONG)
+        View viewForSnackbar = getView();
+        if (viewForSnackbar == null) {
+            return;
+        }
+
+        Snackbar.make(viewForSnackbar, R.string.reminder_has_been_deleted, Snackbar.LENGTH_LONG)
                 .setAction(R.string.reminder_undelete, view -> {
-                    adapter.mData.add(position, reminder);
-                    adapter.notifyItemInserted(position);
+                    mAdapter.data.add(position, reminder);
+                    mAdapter.notifyItemInserted(position);
                 })
                 .addCallback(new Snackbar.Callback() {
                     @Override
@@ -201,7 +210,7 @@ public class RemindersFragment extends Fragment {
 
     class RecycleViewAdapter extends RecyclerView.Adapter<ReminderViewHolder> {
 
-        final List<Reminder> mData = new ArrayList<>();
+        private final List<Reminder> data = new ArrayList<>();
 
         @Override
         public ReminderViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -219,7 +228,7 @@ public class RemindersFragment extends Fragment {
                 }
 
                 int position = vh.getAdapterPosition();
-                Reminder focusing = mData.get(position);
+                Reminder focusing = data.get(position);
                 FragmentManager fm = activity.getSupportFragmentManager();
                 ReminderActionsFragment f = new ReminderActionsFragment();
                 f.show(fm, f.toString());
@@ -243,9 +252,10 @@ public class RemindersFragment extends Fragment {
 
             binding.enabled.setOnClickListener(view -> {
                 int position = vh.getAdapterPosition();
-                Reminder editing = mData.get(position);
+                Reminder editing = data.get(position);
 
-                Reminder toggled = new Reminder(editing);
+                Reminder toggled = new Reminder(Lumindate.getInstance());
+                toggled.sync(editing);
                 toggled.enabled.set(binding.enabled.isChecked());
 
                 startEditingReminder(vh, toggled);
@@ -256,8 +266,8 @@ public class RemindersFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(ReminderViewHolder holder, int position) {
-            if (mData.size() > position) {
-                Reminder reminder = mData.get(position);
+            if (data.size() > position) {
+                Reminder reminder = data.get(position);
 
                 holder.bind(reminder);
             }
@@ -265,7 +275,7 @@ public class RemindersFragment extends Fragment {
 
         @Override
         public int getItemCount() {
-            return mData.size();
+            return data.size();
         }
     }
 }

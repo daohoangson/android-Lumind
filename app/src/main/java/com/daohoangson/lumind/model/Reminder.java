@@ -19,9 +19,9 @@ import java.util.Calendar;
 public class Reminder implements Parcelable {
 
     @NonNull
-    final String existingUuid;
-    private final Lumindate date;
-    private final ReminderPersist.Type type;
+    public String uuid;
+    public final Lumindate date;
+    public ReminderPersist.Type type;
 
     @SuppressWarnings("WeakerAccess")
     public final ObservableInt monthlyOrAnnually = new ObservableInt(R.id.monthly);
@@ -35,28 +35,15 @@ public class Reminder implements Parcelable {
     private Calendar mNextOccurrence = null;
 
     public Reminder(Lumindate date) {
-        existingUuid = "";
+        uuid = "";
         this.date = new Lumindate(date);
         type = ReminderPersist.Type.USER_CREATED;
 
         setupCallbacks();
     }
 
-    public Reminder(Reminder other) {
-        existingUuid = other.existingUuid;
-        date = new Lumindate(other.date);
-        type = other.type;
-
-        setMonthly(other.getMonthly());
-        name.set(other.name.get());
-        note.set(other.note.get());
-        enabled.set(other.enabled.get());
-
-        setupCallbacks();
-    }
-
     public Reminder(ReminderPersist persist) {
-        existingUuid = persist.uuid;
+        uuid = persist.uuid;
         date = new Lumindate(persist.timeInMillis);
         type = persist.getType();
 
@@ -69,7 +56,7 @@ public class Reminder implements Parcelable {
     }
 
     private Reminder(Parcel in) {
-        existingUuid = in.readString();
+        uuid = in.readString();
         date = in.readParcelable(Lumindate.class.getClassLoader());
         type = (ReminderPersist.Type) in.readSerializable();
 
@@ -100,7 +87,7 @@ public class Reminder implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(existingUuid);
+        parcel.writeString(uuid);
         parcel.writeParcelable(date, i);
         parcel.writeSerializable(type);
 
@@ -118,7 +105,7 @@ public class Reminder implements Parcelable {
 
         Reminder other = (Reminder) obj;
 
-        return !(!TextUtils.equals(existingUuid, other.existingUuid) ||
+        return !(!TextUtils.equals(uuid, other.uuid) ||
                 !date.equals(other.date) ||
                 !type.equals(other.type) ||
                 getMonthly() != other.getMonthly() ||
@@ -129,7 +116,7 @@ public class Reminder implements Parcelable {
 
     @Override
     public String toString() {
-        return String.format("uuid=%s, date=%s, monthly=%s", existingUuid, date, getMonthly());
+        return String.format("uuid=%s, date=%s, monthly=%s", uuid, date, getMonthly());
     }
 
     private void setupCallbacks() {
@@ -157,7 +144,7 @@ public class Reminder implements Parcelable {
         if (isInsert()) {
             persist = new ReminderPersist();
         } else {
-            persist = new ReminderPersist(existingUuid);
+            persist = new ReminderPersist(uuid);
         }
 
         ReminderPersist.Recurrence recurrence = monthlyOrAnnually.get() == R.id.monthly ?
@@ -216,27 +203,22 @@ public class Reminder implements Parcelable {
         return mNextOccurrence;
     }
 
-    public long getTimeInMillis() {
-        return date.getTimeInMillis();
-    }
-
-    public ReminderPersist.Type getType() {
-        return type;
-    }
-
     public boolean isInsert() {
-        return TextUtils.isEmpty(existingUuid);
-    }
-
-    public boolean isSameUuid(Reminder other) {
-        return existingUuid.equals(other.existingUuid);
-    }
-
-    public boolean isSameUuid(String uuid) {
-        return existingUuid.equals(uuid);
+        return TextUtils.isEmpty(uuid);
     }
 
     public boolean isSystem() {
         return type != ReminderPersist.Type.USER_CREATED;
+    }
+
+    public void sync(Reminder other) {
+        uuid = other.uuid;
+        date.setTimeInMillis(other.date.getTimeInMillis());
+        type = other.type;
+
+        setMonthly(other.getMonthly());
+        name.set(other.name.get());
+        note.set(other.note.get());
+        enabled.set(other.enabled.get());
     }
 }

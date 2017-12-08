@@ -42,11 +42,11 @@ public class DataStore {
         getInstance(context).executeTransactionAsync(
                 realm -> {
                     boolean deleted = realm.where(ReminderPersist.class)
-                            .equalTo("uuid", reminder.existingUuid)
+                            .equalTo("uuid", reminder.uuid)
                             .findAll()
                             .deleteAllFromRealm();
 
-                    Log.d(TAG, String.format("deleteReminder OK uuid=%s, deleted=%s", reminder.existingUuid, deleted));
+                    Log.d(TAG, String.format("deleteReminder OK uuid=%s, deleted=%s", reminder.uuid, deleted));
                 }
         );
     }

@@ -31,11 +31,11 @@ public class ReminderFragment extends DialogFragment {
     private static final String ARG_REMINDER = "reminder";
     private static final String STATE_REMINDER = "reminder";
 
+    public final Reminder mReminder = new Reminder(Lumindate.getInstance());
     private final AtomicBoolean mSaveRequested = new AtomicBoolean(false);
     private boolean mSuccess = false;
     private Throwable mError = null;
 
-    private FragmentReminderBinding mBinding;
     private WeakReference<CallerActivity> mCallerActivityRef;
     private final Set<OnDismissListener> mListeners = new HashSet<>();
 
@@ -81,7 +81,7 @@ public class ReminderFragment extends DialogFragment {
                 .setNegativeButton(android.R.string.cancel, null);
 
         LayoutInflater inflater = LayoutInflater.from(activity);
-        mBinding = FragmentReminderBinding.inflate(inflater);
+        FragmentReminderBinding binding = FragmentReminderBinding.inflate(inflater);
 
         Bundle args = getArguments();
         if (args == null) {
@@ -93,7 +93,7 @@ public class ReminderFragment extends DialogFragment {
             if (date == null) {
                 throw new RuntimeException("Argument date is missing");
             }
-            setReminder(new Reminder(date));
+            mReminder.date.setTimeInMillis(date.getTimeInMillis());
         }
 
         if (args.containsKey(ARG_REMINDER)) {
@@ -101,21 +101,17 @@ public class ReminderFragment extends DialogFragment {
             if (reminder == null) {
                 throw new RuntimeException("Argument reminder is missing");
             }
-            setReminder(reminder);
+            mReminder.sync(reminder);
         }
 
-        Reminder reminder = mBinding.getReminder();
-        if (reminder == null) {
-            throw new RuntimeException("Arguments bundle is incomplete");
-        }
-        if (reminder.isInsert()) {
+        if (mReminder.isInsert()) {
             builder.setTitle(R.string.title_fragment_reminder_add);
         } else {
             builder.setTitle(R.string.title_fragment_reminder_edit);
         }
-        builder.setMessage(reminder.getDateFormatted(activity));
+        builder.setMessage(mReminder.getDateFormatted(activity));
 
-        builder.setView(mBinding.getRoot());
+        builder.setView(binding.getRoot());
 
         return builder.create();
     }
@@ -162,7 +158,7 @@ public class ReminderFragment extends DialogFragment {
         if (savedInstanceState != null) {
             Reminder reminder = savedInstanceState.getParcelable(STATE_REMINDER);
             if (reminder != null) {
-                setReminder(reminder);
+                mReminder.sync(reminder);
             }
         }
     }
@@ -171,7 +167,7 @@ public class ReminderFragment extends DialogFragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putParcelable(STATE_REMINDER, mBinding.getReminder());
+        outState.putParcelable(STATE_REMINDER, mReminder);
     }
 
     public void addOnDismissListener(OnDismissListener listener) {
@@ -182,24 +178,16 @@ public class ReminderFragment extends DialogFragment {
         mListeners.add(listener);
     }
 
-    private void setReminder(Reminder reminder) {
-        mBinding.setReminder(reminder);
-    }
-
     private void startSavingReminder() {
         mSaveRequested.set(true);
-        final Reminder reminder = mBinding.getReminder();
-        if (reminder == null) {
-            return;
-        }
 
-        DataStore.saveReminder(getContext(), reminder, new DataStore.OnTransactionCompleteListener() {
+        DataStore.saveReminder(getContext(), mReminder, new DataStore.OnTransactionCompleteListener() {
             @Override
             public void onTransactionSuccess() {
                 mSuccess = true;
 
                 if (mCallerActivityRef != null && mCallerActivityRef.get() != null) {
-                    mCallerActivityRef.get().onReminderSaved(reminder, mListeners.size() > 0);
+                    mCallerActivityRef.get().onReminderSaved(mReminder, mListeners.size() > 0);
                 }
 
                 pingListeners(true);
@@ -210,7 +198,7 @@ public class ReminderFragment extends DialogFragment {
                 mError = error;
 
                 if (mCallerActivityRef != null && mCallerActivityRef.get() != null) {
-                    mCallerActivityRef.get().onReminderError(reminder, error, mListeners.size() > 0);
+                    mCallerActivityRef.get().onReminderError(mReminder, error, mListeners.size() > 0);
                 }
 
                 pingListeners(true);
@@ -223,13 +211,8 @@ public class ReminderFragment extends DialogFragment {
             return;
         }
 
-        Reminder reminder = mBinding.getReminder();
-        if (reminder == null) {
-            return;
-        }
-
         for (OnDismissListener listener : mListeners) {
-            listener.onReminderFragmentDismiss(reminder, mSuccess, mError);
+            listener.onReminderFragmentDismiss(mReminder, mSuccess, mError);
         }
     }
 }
