@@ -2,6 +2,7 @@ package com.daohoangson.lumind;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -29,6 +30,7 @@ import com.daohoangson.lumind.utils.PrefUtil;
 
 import java.lang.ref.WeakReference;
 import java.util.Calendar;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity
         implements CalendarFragment.CallerActivity,
@@ -59,6 +61,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setLanguage();
+
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         mBinding.viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
@@ -207,6 +212,28 @@ public class MainActivity extends AppCompatActivity
         }
 
         imm.hideSoftInputFromWindow(findViewById(R.id.viewPager).getWindowToken(), 0);
+    }
+
+    private void setLanguage() {
+        String language = PrefUtil.getLanguage(this);
+        if (SettingsFragment.PREF_LANGUAGE_DEFAULT.equals(language)) {
+            Log.v(TAG, "Requested default language, nothing to do");
+            return;
+        }
+
+        Locale expected = new Locale(language);
+        Locale actual = Locale.getDefault();
+        if (actual != null && actual.equals(expected)) {
+            Log.v(TAG, "Locales matched, move on");
+            return;
+        }
+
+        Locale.setDefault(expected);
+        Configuration config = new Configuration();
+        config.locale = expected;
+        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
+        Log.v(TAG, String.format("Updated locale config from %s to %s",
+                actual != null ? actual.getLanguage() : "N/A", expected.getLanguage()));
     }
 
     private void startFabAction() {

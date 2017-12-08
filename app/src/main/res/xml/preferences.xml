@@ -13,4 +13,13 @@
         android:key="pref_remind_how_far"
         android:summary="@string/pref_remind_how_far_summary"
         android:title="@string/pref_remind_how_far" />
+
+    <ListPreference
+        android:defaultValue="default"
+        android:dependency="pref_language"
+        android:entries="@array/pref_language"
+        android:entryValues="@array/pref_language_values"
+        android:key="pref_language"
+        android:summary="@string/pref_language_summary"
+        android:title="@string/pref_language" />
 </PreferenceScreen>

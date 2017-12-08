@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_fragment_calendar">Lịch</string>
+    <string name="month_short_x_leap">%s(N)</string>
+    <string name="solar_to_lunar">Dương lịch qua Âm lịch</string>
+    <string name="lunar_to_solar">Âm lịch qua Dương lịch</string>
+    <string name="title_fragment_reminder_add">Thêm thông báo</string>
+    <string name="title_fragment_reminder_edit">Sửa thông báo</string>
+    <string name="form_reminder_name">Thông báo</string>
+    <string name="form_reminder_system_name">Thông báo</string>
+    <string name="form_reminder_note">Ghi chú</string>
+    <string name="form_reminder_monthly">Hàng tháng</string>
+    <string name="form_reminder_annually">Hàng năm</string>
+    <string name="form_reminder_lunar">Âm lịch</string>
+    <string name="form_reminder_enabled">Hoạt động</string>
+    <string name="form_reminder_added">Đã thêm thông báo!</string>
+    <string name="form_reminder_updated">Đã lưu thông báo!</string>
+    <string name="form_reminder_error">Lưu thông báo không thành công, xin vui lòng thử lại.</string>
+    <string name="title_fragment_reminders">Các thông báo</string>
+    <string name="reminder_lunar_day_x">Ngày %d âm lịch</string>
+    <string name="reminder_lunar_date_x_leap">%s (nhuận)</string>
+    <string name="reminder_default_daily_first">Mùng một</string>
+    <string name="reminder_default_daily_fifteenth">Rằm</string>
+    <string name="reminder_default_vesak">Phật Đản</string>
+    <string name="remind_monthly">Nhắc hàng tháng</string>
+    <string name="remind_annually">Nhắc mỗi năm một lần</string>
+    <string name="next_occurrence_in_x">\u00A0(trong %s nữa)</string>
+    <string name="next_occurrence_tomorrow">\u00A0(ngày mai)</string>
+    <string name="next_occurrence_day_after_tomorrow">\u00A0(ngày kia)</string>
+    <string name="reminder_has_been_deleted">Đã xoá thông báo.</string>
+    <string name="reminder_undelete">Huỷ xoá</string>
+    <string name="title_fragment_settings">Thiết lập</string>
+    <string name="pref_remind">Thông báo</string>
+    <string name="pref_remind_how_far">Báo trước bao lâu</string>
+    <string name="pref_language">Ngôn ngữ / Language</string>
+    <string name="reminder_ntf_channel_name">Thông báo</string>
+
+    <string-array name="reminder_actions">
+        <item>Xem ngày</item>
+        <item>Sửa</item>
+        <item>Xoá</item>
+    </string-array>
+    <string-array name="pref_remind_how_far">
+        <item>Một ngày</item>
+        <item>3 ngày</item>
+        <item>Một tuần</item>
+        <item>Một tháng (30 ngày)</item>
+    </string-array>
+    <string-array name="pref_language">
+        <item>Mặc định (Tiếng Việt)</item>
+        <item>Tiếng Việt</item>
+        <item>English</item>
+    </string-array>
+    <string-array name="pref_language_values">
+        <item>default</item>
+        <item>vi</item>
+        <item>en</item>
+    </string-array>
+
+    <plurals name="x_days">
+        <item quantity="other">%d ngày</item>
+    </plurals>
+    <plurals name="x_months">
+        <item quantity="other">%d tháng</item>
+    </plurals>
+</resources>

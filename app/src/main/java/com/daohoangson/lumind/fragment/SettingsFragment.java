@@ -1,5 +1,6 @@
 package com.daohoangson.lumind.fragment;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -13,6 +14,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
     public static final String PREF_REMIND = "pref_remind";
     public static final String PREF_REMIND_HOW_FAR = "pref_remind_how_far";
+    public static final String PREF_LANGUAGE = "pref_language";
+    public static final String PREF_LANGUAGE_DEFAULT = "default";
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -35,16 +38,24 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (PREF_REMIND.equals(key)) {
-            boolean prefRemind = sharedPreferences.getBoolean(key, false);
-            Context context = getContext();
+        switch (key) {
+            case PREF_REMIND:
+                boolean prefRemind = sharedPreferences.getBoolean(key, false);
+                Context context = getContext();
 
-            if (prefRemind) {
-                AlarmReceiver.setup(context);
-                ReminderEngine.remind(context);
-            } else {
-                AlarmReceiver.cancel(context);
-            }
+                if (prefRemind) {
+                    AlarmReceiver.setup(context);
+                    ReminderEngine.remind(context);
+                } else {
+                    AlarmReceiver.cancel(context);
+                }
+                break;
+            case PREF_LANGUAGE:
+                Activity activity = getActivity();
+                if (activity != null) {
+                    activity.recreate();
+                }
+                break;
         }
     }
 }
