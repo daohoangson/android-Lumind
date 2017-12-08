@@ -45,6 +45,16 @@ public class Lumindate extends BaseObservable implements Parcelable {
         this(other.getTimeInMillis());
     }
 
+    Lumindate(int lunarDay, int lunarMonth) {
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.YEAR, -1);
+
+        setLunarDate(lunarDay, lunarMonth, c.get(Calendar.YEAR));
+        validateLunarValues();
+        calculateSolar();
+        setupCallbacks();
+    }
+
     private Lumindate(Parcel in) {
         this(in.readLong());
     }

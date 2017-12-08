@@ -8,6 +8,7 @@ import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.daohoangson.lumind.Constant;
@@ -15,6 +16,7 @@ import com.daohoangson.lumind.MainActivity;
 import com.daohoangson.lumind.R;
 import com.daohoangson.lumind.model.DataStore;
 import com.daohoangson.lumind.model.Lumindate;
+import com.daohoangson.lumind.model.Reminder;
 import com.daohoangson.lumind.model.ReminderPersist;
 import com.daohoangson.lumind.utils.NextOccurrence;
 import com.daohoangson.lumind.utils.PrefUtil;
@@ -69,6 +71,10 @@ public class ReminderEngine {
             }
 
             String contentTitle = reminder.getName();
+            if (TextUtils.isEmpty(contentTitle)) {
+                contentTitle = new Reminder(reminder).getNameForShow(context);
+            }
+
             String formattedDate = StringUtil.formatDate(context, date, monthly);
             String nextOccurrenceInX = StringUtil.formatNextOccurrenceInX(context.getResources(), since, no);
             String contentText = formattedDate + nextOccurrenceInX;

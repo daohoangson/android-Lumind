@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity
             String ntfReminderUuid = intent.getStringExtra(ARG_NTF_REMINDER_UUID);
             DataStore.getReminders(this, results -> {
                 for (Reminder reminder : results) {
-                    if (!reminder.existingUuid.equals(ntfReminderUuid)) {
+                    if (!reminder.isSameUuid(ntfReminderUuid)) {
                         continue;
                     }
 
@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity
         hideSoftKeyboard();
 
         Snackbar.make(findViewById(R.id.viewPager),
-                reminder.existingUuid == null
+                reminder.isInsert()
                         ? R.string.form_reminder_added
                         : R.string.form_reminder_updated,
                 Snackbar.LENGTH_SHORT).show();

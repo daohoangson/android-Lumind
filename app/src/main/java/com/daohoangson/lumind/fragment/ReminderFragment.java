@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -17,10 +16,9 @@ import android.view.WindowManager;
 
 import com.daohoangson.lumind.R;
 import com.daohoangson.lumind.databinding.FragmentReminderBinding;
-import com.daohoangson.lumind.model.Reminder;
-import com.daohoangson.lumind.model.Lumindate;
 import com.daohoangson.lumind.model.DataStore;
-import com.daohoangson.lumind.utils.StringUtil;
+import com.daohoangson.lumind.model.Lumindate;
+import com.daohoangson.lumind.model.Reminder;
 
 import java.lang.ref.WeakReference;
 import java.util.HashSet;
@@ -110,12 +108,12 @@ public class ReminderFragment extends DialogFragment {
         if (reminder == null) {
             throw new RuntimeException("Arguments bundle is incomplete");
         }
-        builder.setMessage(StringUtil.formatDate(activity, reminder.date, false));
-        if (TextUtils.isEmpty(reminder.existingUuid)) {
+        if (reminder.isInsert()) {
             builder.setTitle(R.string.title_fragment_reminder_add);
         } else {
             builder.setTitle(R.string.title_fragment_reminder_edit);
         }
+        builder.setMessage(reminder.getDateFormatted(activity));
 
         builder.setView(mBinding.getRoot());
 

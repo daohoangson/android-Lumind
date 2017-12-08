@@ -17,6 +17,7 @@ import io.realm.RealmResults;
 public class DataStore {
 
     private static final String TAG = "DataStore";
+    private static final String REALM_NAME = "lumind.realm";
 
     public static void saveReminder(Context context, Reminder reminder, OnTransactionCompleteListener listener) {
         getInstance(context).executeTransactionAsync(
@@ -37,15 +38,15 @@ public class DataStore {
         );
     }
 
-    public static void deleteReminder(Context context, final String uuid) {
+    public static void deleteReminder(Context context, Reminder reminder) {
         getInstance(context).executeTransactionAsync(
                 realm -> {
                     boolean deleted = realm.where(ReminderPersist.class)
-                            .equalTo("uuid", uuid)
+                            .equalTo("uuid", reminder.existingUuid)
                             .findAll()
                             .deleteAllFromRealm();
 
-                    Log.d(TAG, String.format("deleteReminder OK uuid=%s, deleted=%s", uuid, deleted));
+                    Log.d(TAG, String.format("deleteReminder OK uuid=%s, deleted=%s", reminder.existingUuid, deleted));
                 }
         );
     }
@@ -110,7 +111,24 @@ public class DataStore {
         Realm.init(context.getApplicationContext());
 
         RealmConfiguration realmConfig = new RealmConfiguration.Builder()
-                .deleteRealmIfMigrationNeeded()
+                .name(REALM_NAME)
+                .schemaVersion(1)
+                .initialData(realm -> {
+                    Log.d(TAG, "Initializing initial data...");
+
+                    List<ReminderPersist> list = new ArrayList<>();
+                    list.add(new ReminderPersist().with(ReminderPersist.Type.THE_FIRST));
+                    list.add(new ReminderPersist().with(ReminderPersist.Type.THE_FIFTEENTH));
+                    list.add(new ReminderPersist().with(ReminderPersist.Type.VESAK));
+
+                    realm.insert(list);
+                    Log.i(TAG, String.format("Inserted %d default reminders", list.size()));
+                })
+                .migration((realm, oldVersion, newVersion) -> {
+                    Log.d(TAG, String.format("Migrating from %d to %d...", oldVersion, newVersion));
+
+                    // TODO
+                })
                 .build();
 
         Realm r = Realm.getInstance(realmConfig);

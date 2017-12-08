@@ -7,6 +7,7 @@
     <string name="title_fragment_reminder_add">Add Reminder</string>
     <string name="title_fragment_reminder_edit">Edit Reminder</string>
     <string name="form_reminder_name">Reminder</string>
+    <string name="form_reminder_system_name">System Reminder</string>
     <string name="form_reminder_note">Note</string>
     <string name="form_reminder_monthly">Monthly</string>
     <string name="form_reminder_annually">Annually</string>
@@ -19,6 +20,9 @@
     <string name="reminder_lunar_day_x">Lunar day %d</string>
     <string name="reminder_lunar_date_x">%s</string>
     <string name="reminder_lunar_date_x_leap">%s (leap)</string>
+    <string name="reminder_default_daily_first">The 1st</string>
+    <string name="reminder_default_daily_fifteenth">The 15th</string>
+    <string name="reminder_default_vesak">Vesak</string>
     <string name="remind_monthly">Remind every month</string>
     <string name="remind_annually">Remind once a year</string>
     <string name="next_occurrence_in_x">\u00A0(in %s)</string>

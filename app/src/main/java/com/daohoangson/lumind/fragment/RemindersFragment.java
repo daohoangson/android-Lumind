@@ -150,9 +150,9 @@ public class RemindersFragment extends Fragment {
                 startRefreshing();
                 return;
             }
-            Reminder vhReminder = adapter.mData.get(position);
 
-            if (!edited.existingUuid.equals(vhReminder.existingUuid)) {
+            Reminder vhReminder = adapter.mData.get(position);
+            if (!vhReminder.isSameUuid(edited)) {
                 startRefreshing();
                 return;
             }
@@ -192,7 +192,7 @@ public class RemindersFragment extends Fragment {
                         super.onDismissed(snackbar, event);
 
                         if (event != Snackbar.Callback.DISMISS_EVENT_ACTION) {
-                            DataStore.deleteReminder(getContext(), reminder.existingUuid);
+                            DataStore.deleteReminder(getContext(), reminder);
                         }
                     }
                 })

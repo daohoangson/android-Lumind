@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 import io.realm.RealmObject;
@@ -25,6 +26,7 @@ public class ReminderPersist extends RealmObject {
 
     public boolean enabled = true;
     public long timeInMillis;
+    private int type = Type.USER_CREATED.ordinal();
 
     private String data;
 
@@ -35,12 +37,12 @@ public class ReminderPersist extends RealmObject {
         uuid = UUID.randomUUID().toString();
     }
 
-    ReminderPersist(String uuid) {
+    public ReminderPersist(String uuid) {
         this.uuid = uuid;
     }
 
     public boolean getMonthly() {
-        return getRecurrence() == Recurrence.MONTHLY;
+        return getRecurrence() != Recurrence.ANNUALLY;
     }
 
     @NonNull
@@ -63,6 +65,36 @@ public class ReminderPersist extends RealmObject {
         return (String) note;
     }
 
+    Type getType() {
+        return Type.values()[type];
+    }
+
+    public ReminderPersist with(Recurrence recurrence) {
+        return withData(DATA_RECURRENCE, recurrence.name());
+    }
+
+    public ReminderPersist with(Type sc) {
+        switch (sc) {
+            case THE_FIRST:
+                withDate(new Lumindate(1, 0));
+                break;
+            case THE_FIFTEENTH:
+                withDate(new Lumindate(15, 0));
+                break;
+            case VESAK:
+                withDate(new Lumindate(14, 3));
+                with(Recurrence.ANNUALLY);
+                withEnabled(false);
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+
+        type = sc.ordinal();
+
+        return this;
+    }
+
     ReminderPersist withDate(@NonNull Lumindate date) {
         timeInMillis = date.getTimeInMillis();
 
@@ -80,15 +112,6 @@ public class ReminderPersist extends RealmObject {
 
     ReminderPersist withNote(String note) {
         return withData(DATA_NOTE, note);
-    }
-
-    ReminderPersist withRecurrence(Recurrence recurrence) {
-        return withData(DATA_RECURRENCE, recurrence.name());
-    }
-
-    enum Recurrence {
-        MONTHLY,
-        ANNUALLY
     }
 
     private void ensureDataObj() {
@@ -151,5 +174,17 @@ public class ReminderPersist extends RealmObject {
         data = mDataObj.toString();
 
         return this;
+    }
+
+    public enum Recurrence {
+        MONTHLY,
+        ANNUALLY
+    }
+
+    public enum Type implements Serializable {
+        USER_CREATED,
+        THE_FIRST,
+        THE_FIFTEENTH,
+        VESAK,
     }
 }

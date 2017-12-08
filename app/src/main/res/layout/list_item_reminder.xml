@@ -40,26 +40,15 @@
                 tools:src="@drawable/ic_moon_colored" />
 
             <TextView
-                android:id="@+id/date"
+                android:id="@+id/name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_toEndOf="@id/icon"
                 android:layout_toRightOf="@id/icon"
-                android:text="@{reminder.getDayMonthYear(context)}"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                tools:text="30 / 08 / 2006" />
-
-            <TextView
-                android:id="@+id/name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/date"
-                android:layout_toEndOf="@id/icon"
-                android:layout_toRightOf="@id/icon"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="@{reminder.name}"
+                android:text="@{reminder.getNameForShow(context)}"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 tools:text="@string/form_reminder_name" />
 
@@ -72,7 +61,6 @@
                 android:layout_toRightOf="@id/icon"
                 android:text="@{reminder.note}"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:visibility="@{TextUtils.isEmpty(reminder.note) ? View.GONE : View.VISIBLE}"
                 tools:text="@string/form_reminder_note" />
 
             <LinearLayout
