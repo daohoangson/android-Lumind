@@ -2,7 +2,6 @@ package com.daohoangson.lumind.fragment;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -20,7 +19,6 @@ import com.daohoangson.lumind.model.DataStore;
 import com.daohoangson.lumind.model.Lumindate;
 import com.daohoangson.lumind.model.Reminder;
 
-import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -31,12 +29,10 @@ public class ReminderFragment extends DialogFragment {
     private static final String ARG_REMINDER = "reminder";
     private static final String STATE_REMINDER = "reminder";
 
-    public final Reminder mReminder = new Reminder(Lumindate.getInstance());
+    private final Reminder mReminder = new Reminder(Lumindate.getInstance());
     private final AtomicBoolean mSaveRequested = new AtomicBoolean(false);
-    private boolean mSuccess = false;
     private Throwable mError = null;
 
-    private WeakReference<CallerActivity> mCallerActivityRef;
     private final Set<OnDismissListener> mListeners = new HashSet<>();
 
     public static ReminderFragment newInstance(Lumindate date) {
@@ -66,7 +62,7 @@ public class ReminderFragment extends DialogFragment {
     }
 
     public interface OnDismissListener {
-        void onReminderFragmentDismiss(@NonNull Reminder reminder, boolean success, Throwable error);
+        void onReminderFragmentDismiss(@NonNull Reminder reminder, Throwable error);
     }
 
     @NonNull
@@ -131,16 +127,6 @@ public class ReminderFragment extends DialogFragment {
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        Activity activity = getActivity();
-        if (activity instanceof CallerActivity) {
-            mCallerActivityRef = new WeakReference<>((CallerActivity) activity);
-        }
-    }
-
-    @Override
     public void onCancel(DialogInterface dialog) {
         super.onCancel(dialog);
         pingListeners(false);
@@ -179,16 +165,25 @@ public class ReminderFragment extends DialogFragment {
         mListeners.add(listener);
     }
 
+    @Nullable
+    private CallerActivity getCallerActivity() {
+        Activity activity = getActivity();
+        if (activity == null || !(activity instanceof CallerActivity)) {
+            return null;
+        }
+
+        return (CallerActivity) activity;
+    }
+
     private void startSavingReminder() {
         mSaveRequested.set(true);
 
         DataStore.saveReminder(getContext(), mReminder, new DataStore.OnTransactionCompleteListener() {
             @Override
             public void onTransactionSuccess() {
-                mSuccess = true;
-
-                if (mCallerActivityRef != null && mCallerActivityRef.get() != null) {
-                    mCallerActivityRef.get().onReminderSaved(mReminder, mListeners.size() > 0);
+                CallerActivity activity = getCallerActivity();
+                if (activity != null) {
+                    activity.onReminderSaved(mReminder, mListeners.size() > 0);
                 }
 
                 pingListeners(true);
@@ -198,8 +193,9 @@ public class ReminderFragment extends DialogFragment {
             public void onTransactionError(Throwable error) {
                 mError = error;
 
-                if (mCallerActivityRef != null && mCallerActivityRef.get() != null) {
-                    mCallerActivityRef.get().onReminderError(mReminder, error, mListeners.size() > 0);
+                CallerActivity activity = getCallerActivity();
+                if (activity != null) {
+                    activity.onReminderError(mReminder, error, mListeners.size() > 0);
                 }
 
                 pingListeners(true);
@@ -213,7 +209,7 @@ public class ReminderFragment extends DialogFragment {
         }
 
         for (OnDismissListener listener : mListeners) {
-            listener.onReminderFragmentDismiss(mReminder, mSuccess, mError);
+            listener.onReminderFragmentDismiss(mReminder, mError);
         }
     }
 }

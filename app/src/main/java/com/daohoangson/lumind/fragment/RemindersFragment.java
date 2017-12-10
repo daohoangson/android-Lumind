@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -40,6 +41,10 @@ public class RemindersFragment extends Fragment {
     }
 
     public interface CallerActivity {
+        void onReminderInlineSaved(Reminder reminder);
+
+        void onReminderInlineError(Reminder reminder, Throwable error);
+
         void setCalendarDate(Lumindate date);
 
         void setRemindersFragment(RemindersFragment f);
@@ -128,6 +133,39 @@ public class RemindersFragment extends Fragment {
         });
     }
 
+    @Nullable
+    private CallerActivity getCallerActivity() {
+        Activity activity = getActivity();
+        if (activity == null || !(activity instanceof CallerActivity)) {
+            return null;
+        }
+
+        return (CallerActivity) activity;
+    }
+
+    private void onReminder(ReminderViewHolder vh, Reminder reminder, Throwable error) {
+        int position = vh.getAdapterPosition();
+        if (position < 0 || position >= mAdapter.data.size()) {
+            startRefreshing();
+            return;
+        }
+
+        Reminder vhReminder = mAdapter.data.get(position);
+        if (!vhReminder.uuid.equals(reminder.uuid)) {
+            startRefreshing();
+            return;
+        }
+
+        if (error != null) {
+            vh.bind(vhReminder);
+            return;
+        }
+
+        mAdapter.data.remove(position);
+        mAdapter.data.add(position, reminder);
+        vh.bind(reminder);
+    }
+
     private void startViewingReminder(ReminderViewHolder vh) {
         int position = vh.getAdapterPosition();
         Reminder reminder = mAdapter.data.get(position);
@@ -149,28 +187,7 @@ public class RemindersFragment extends Fragment {
 
         FragmentManager fm = activity.getSupportFragmentManager();
         ReminderFragment reminderFragment = ReminderFragment.newInstance(reminder);
-        reminderFragment.addOnDismissListener((edited, success, error) -> {
-            int position = vh.getAdapterPosition();
-            if (position < 0 || position >= mAdapter.data.size()) {
-                startRefreshing();
-                return;
-            }
-
-            Reminder vhReminder = mAdapter.data.get(position);
-            if (!vhReminder.uuid.equals(edited.uuid)) {
-                startRefreshing();
-                return;
-            }
-
-            if (!success) {
-                vh.bind(vhReminder);
-                return;
-            }
-
-            mAdapter.data.remove(position);
-            mAdapter.data.add(position, edited);
-            vh.bind(edited);
-        });
+        reminderFragment.addOnDismissListener((edited, error) -> onReminder(vh, edited, error));
 
         reminderFragment.show(fm, reminderFragment.toString());
     }
@@ -206,6 +223,37 @@ public class RemindersFragment extends Fragment {
                     }
                 })
                 .show();
+    }
+
+    private void startTogglingReminder(ReminderViewHolder vh, boolean enabled) {
+        int position = vh.getAdapterPosition();
+        Reminder editing = mAdapter.data.get(position);
+
+        Reminder toggled = new Reminder(Lumindate.getInstance());
+        toggled.sync(editing);
+        toggled.enabled.set(enabled);
+
+        DataStore.saveReminder(getContext(), toggled, new DataStore.OnTransactionCompleteListener() {
+            @Override
+            public void onTransactionSuccess() {
+                onReminder(vh, toggled, null);
+
+                CallerActivity activity = getCallerActivity();
+                if (activity != null) {
+                    activity.onReminderInlineSaved(toggled);
+                }
+            }
+
+            @Override
+            public void onTransactionError(Throwable error) {
+                onReminder(vh, toggled, error);
+
+                CallerActivity activity = getCallerActivity();
+                if (activity != null) {
+                    activity.onReminderInlineError(toggled, error);
+                }
+            }
+        });
     }
 
     class RecycleViewAdapter extends RecyclerView.Adapter<ReminderViewHolder> {
@@ -250,16 +298,7 @@ public class RemindersFragment extends Fragment {
                 return true;
             });
 
-            binding.enabled.setOnClickListener(view -> {
-                int position = vh.getAdapterPosition();
-                Reminder editing = data.get(position);
-
-                Reminder toggled = new Reminder(Lumindate.getInstance());
-                toggled.sync(editing);
-                toggled.enabled.set(binding.enabled.isChecked());
-
-                startEditingReminder(vh, toggled);
-            });
+            binding.enabled.setOnClickListener(view -> startTogglingReminder(vh, binding.enabled.isChecked()));
 
             return vh;
         }

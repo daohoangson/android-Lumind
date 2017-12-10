@@ -95,6 +95,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:checked="@{reminder.enabled}"
+                android:contentDescription="@string/form_reminder_enabled"
                 tools:checked="true" />
 
         </RelativeLayout>

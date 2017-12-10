@@ -91,12 +91,5 @@
 
         </android.support.design.widget.TextInputLayout>
 
-        <CheckBox
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:checked="@={reminder.enabled}"
-            android:text="@string/form_reminder_enabled"
-            android:visibility="@{reminder.isInsert() ? View.GONE : View.VISIBLE}" />
-
     </LinearLayout>
 </layout>

@@ -172,6 +172,16 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void onReminderInlineSaved(Reminder reminder) {
+        onReminderSaved(reminder, true);
+    }
+
+    @Override
+    public void onReminderInlineError(Reminder reminder, Throwable error) {
+        onReminderError(reminder, error, true);
+    }
+
+    @Override
     public void setCalendarDate(Lumindate date) {
         if (mCalendarFragmentRef == null) {
             return;
