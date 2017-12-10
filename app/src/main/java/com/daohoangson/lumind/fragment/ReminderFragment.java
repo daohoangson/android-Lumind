@@ -82,6 +82,7 @@ public class ReminderFragment extends DialogFragment {
 
         LayoutInflater inflater = LayoutInflater.from(activity);
         FragmentReminderBinding binding = FragmentReminderBinding.inflate(inflater);
+        binding.setReminder(mReminder);
 
         Bundle args = getArguments();
         if (args == null) {
