@@ -167,19 +167,24 @@ public class RemindersFragment extends Fragment {
     }
 
     private void startViewingReminder(ReminderViewHolder vh) {
+        CallerActivity activity = getCallerActivity();
+        if (activity == null) {
+            return;
+        }
+
         int position = vh.getAdapterPosition();
         Reminder reminder = mAdapter.data.get(position);
 
-        Activity activity = getActivity();
-        if (activity instanceof CallerActivity) {
-            Calendar c = Calendar.getInstance();
-            Calendar no = reminder.getNextOccurrence(c);
-            Lumindate date = new Lumindate(no.getTimeInMillis());
-            ((CallerActivity) activity).setCalendarDate(date);
-        }
+        Calendar c = Calendar.getInstance();
+        Calendar no = reminder.getNextOccurrence(c);
+        Lumindate date = new Lumindate(no.getTimeInMillis());
+        activity.setCalendarDate(date);
     }
 
-    private void startEditingReminder(ReminderViewHolder vh, Reminder reminder) {
+    private void startEditingReminder(ReminderViewHolder vh) {
+        int position = vh.getAdapterPosition();
+        Reminder reminder = mAdapter.data.get(position);
+
         FragmentActivity activity = getActivity();
         if (activity == null) {
             return;
@@ -267,7 +272,7 @@ public class RemindersFragment extends Fragment {
             ReminderViewHolder vh = new ReminderViewHolder(binding);
             View root = binding.getRoot();
 
-            root.setOnClickListener(view -> startViewingReminder(vh));
+            root.setOnClickListener(view -> startEditingReminder(vh));
 
             root.setOnLongClickListener(view -> {
                 FragmentActivity activity = getActivity();
@@ -275,8 +280,6 @@ public class RemindersFragment extends Fragment {
                     return false;
                 }
 
-                int position = vh.getAdapterPosition();
-                Reminder focusing = data.get(position);
                 FragmentManager fm = activity.getSupportFragmentManager();
                 ReminderActionsFragment f = new ReminderActionsFragment();
                 f.show(fm, f.toString());
@@ -287,7 +290,7 @@ public class RemindersFragment extends Fragment {
                             startViewingReminder(vh);
                             break;
                         case EDIT:
-                            startEditingReminder(vh, focusing);
+                            startEditingReminder(vh);
                             break;
                         case DELETE:
                             startDeletingReminder(vh);
