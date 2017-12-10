@@ -82,19 +82,19 @@ public class ParcelableTest {
     @Test
     public void testReminderMonthly() {
         Reminder reminder1 = new Reminder(Lumindate.getInstance());
-        reminder1.monthlyOrAnnually.set(R.id.monthly);
+        reminder1.monthly.set(true);
         Reminder reminder2 = doIt(reminder1, Reminder.CREATOR);
 
-        assertEquals(true, reminder2.getMonthly());
+        assertEquals(true, reminder2.monthly.get());
     }
 
     @Test
     public void testReminderAnnually() {
         Reminder reminder1 = new Reminder(Lumindate.getInstance());
-        reminder1.monthlyOrAnnually.set(R.id.annually);
+        reminder1.monthly.set(false);
         Reminder reminder2 = doIt(reminder1, Reminder.CREATOR);
 
-        assertEquals(false, reminder2.getMonthly());
+        assertEquals(false, reminder2.monthly.get());
     }
 
     @Test

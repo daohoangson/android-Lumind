@@ -101,7 +101,7 @@ public class LunarReminderTest {
         date.setLunarDate(values[0], values[1], values[2]);
 
         Reminder reminder = new Reminder(date);
-        reminder.setMonthly(monthly);
+        reminder.monthly.set(monthly);
 
         return reminder;
     }

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.databinding.Observable;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
-import android.databinding.ObservableInt;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -24,7 +23,7 @@ public class Reminder implements Parcelable {
     public ReminderPersist.Type type;
 
     @SuppressWarnings("WeakerAccess")
-    public final ObservableInt monthlyOrAnnually = new ObservableInt(R.id.monthly);
+    public final ObservableBoolean monthly = new ObservableBoolean(true);
     @SuppressWarnings("WeakerAccess")
     public final ObservableField<String> name = new ObservableField<>("");
     @SuppressWarnings("WeakerAccess")
@@ -47,7 +46,7 @@ public class Reminder implements Parcelable {
         date = new Lumindate(persist.timeInMillis);
         type = persist.getType();
 
-        setMonthly(persist.getMonthly());
+        monthly.set(persist.getMonthly());
         name.set(persist.getName());
         note.set(persist.getNote());
         enabled.set(persist.enabled);
@@ -60,7 +59,7 @@ public class Reminder implements Parcelable {
         date = in.readParcelable(Lumindate.class.getClassLoader());
         type = (ReminderPersist.Type) in.readSerializable();
 
-        setMonthly(in.readInt() > 0);
+        monthly.set(in.readInt() > 0);
         name.set(in.readString());
         note.set(in.readString());
         enabled.set(in.readInt() > 0);
@@ -91,7 +90,7 @@ public class Reminder implements Parcelable {
         parcel.writeParcelable(date, i);
         parcel.writeSerializable(type);
 
-        parcel.writeInt(getMonthly() ? 1 : 0);
+        parcel.writeInt(monthly.get() ? 1 : 0);
         parcel.writeString(name.get());
         parcel.writeString(note.get());
         parcel.writeInt(enabled.get() ? 1 : 0);
@@ -108,7 +107,7 @@ public class Reminder implements Parcelable {
         return !(!TextUtils.equals(uuid, other.uuid) ||
                 !date.equals(other.date) ||
                 !type.equals(other.type) ||
-                getMonthly() != other.getMonthly() ||
+                monthly.get() != other.monthly.get() ||
                 !TextUtils.equals(name.get(), other.name.get()) ||
                 !TextUtils.equals(note.get(), other.note.get()) ||
                 enabled.get() != other.enabled.get());
@@ -116,7 +115,7 @@ public class Reminder implements Parcelable {
 
     @Override
     public String toString() {
-        return String.format("uuid=%s, date=%s, monthly=%s", uuid, date, getMonthly());
+        return String.format("uuid=%s, date=%s, monthly=%s", uuid, date, monthly.get());
     }
 
     private void setupCallbacks() {
@@ -128,15 +127,7 @@ public class Reminder implements Parcelable {
         };
 
         date.addOnPropertyChangedCallback(resetNextOccurrenceCallback);
-        monthlyOrAnnually.addOnPropertyChangedCallback(resetNextOccurrenceCallback);
-    }
-
-    public void setMonthly(boolean monthly) {
-        if (monthly) {
-            monthlyOrAnnually.set(R.id.monthly);
-        } else {
-            monthlyOrAnnually.set(R.id.annually);
-        }
+        monthly.addOnPropertyChangedCallback(resetNextOccurrenceCallback);
     }
 
     ReminderPersist build() {
@@ -147,7 +138,7 @@ public class Reminder implements Parcelable {
             persist = new ReminderPersist(uuid);
         }
 
-        ReminderPersist.Recurrence recurrence = monthlyOrAnnually.get() == R.id.monthly ?
+        ReminderPersist.Recurrence recurrence = monthly.get() ?
                 ReminderPersist.Recurrence.MONTHLY :
                 ReminderPersist.Recurrence.ANNUALLY;
 
@@ -156,14 +147,6 @@ public class Reminder implements Parcelable {
                 .withName(name.get())
                 .withNote(note.get())
                 .with(recurrence);
-    }
-
-    public String getDateFormatted(Context context) {
-        return StringUtil.formatDate(context, date, false);
-    }
-
-    public boolean getMonthly() {
-        return monthlyOrAnnually.get() == R.id.monthly;
     }
 
     public String getNameForShow(Context context) {
@@ -181,7 +164,7 @@ public class Reminder implements Parcelable {
                 return context.getString(R.string.reminder_default_vesak);
         }
 
-        return StringUtil.formatDate(context, this.date, getMonthly());
+        return StringUtil.formatDate(context, this.date, monthly.get());
     }
 
     public Calendar getNextOccurrence(@NonNull Calendar since) {
@@ -196,7 +179,7 @@ public class Reminder implements Parcelable {
         }
 
         if (mNextOccurrence == null) {
-            mNextOccurrence = NextOccurrence.lunar(since, date, getMonthly());
+            mNextOccurrence = NextOccurrence.lunar(since, date, monthly.get());
             mNextOccurrenceSince = (Calendar) since.clone();
         }
 
@@ -216,7 +199,7 @@ public class Reminder implements Parcelable {
         date.setTimeInMillis(other.date.getTimeInMillis());
         type = other.type;
 
-        setMonthly(other.getMonthly());
+        monthly.set(other.monthly.get());
         name.set(other.name.get());
         note.set(other.note.get());
         enabled.set(other.enabled.get());

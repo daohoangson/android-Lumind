@@ -12,11 +12,11 @@ public class NextOccurrence {
 
     public static Calendar lunar(@NonNull Calendar since, Lumindate date, boolean monthly) {
         Calendar c = (Calendar) since.clone();
+        double timeZoneOffset = Lumindate.getTimeZoneOffset();
 
         while (true) {
             c.add(Calendar.DATE, 1);
 
-            double timeZoneOffset = Lumindate.getTimeZoneOffset();
             int[] tmpLunar = VietCalendar.convertSolar2Lunar(c.get(Calendar.DATE),
                     c.get(Calendar.MONTH) + 1, c.get(Calendar.YEAR), timeZoneOffset);
             int daysInMonth = VietCalendar.getLunarDaysInMonth(tmpLunar[1],

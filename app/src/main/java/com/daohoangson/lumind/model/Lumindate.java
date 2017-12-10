@@ -2,11 +2,14 @@ package com.daohoangson.lumind.model;
 
 import android.databinding.BaseObservable;
 import android.databinding.Observable;
+import android.databinding.ObservableArrayList;
 import android.databinding.ObservableInt;
+import android.databinding.ObservableList;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -26,6 +29,8 @@ public class Lumindate extends BaseObservable implements Parcelable {
     public final ObservableInt lunarDay = new ObservableInt(0);
     @SuppressWarnings("WeakerAccess")
     public final ObservableInt lunarMonthRaw = new ObservableInt(0);
+    @SuppressWarnings("WeakerAccess")
+    public final ObservableList<String> lunarMonths = new ObservableArrayList<>();
     public final ObservableInt lunarYear = new ObservableInt(0);
 
     private final AtomicBoolean mCorrectnessGuarantee = new AtomicBoolean(true);
@@ -120,19 +125,7 @@ public class Lumindate extends BaseObservable implements Parcelable {
 
         lunarDay.set(day);
         lunarYear.set(year);
-
-        List<LunarMonth> months = LunarMonth.getLunarMonths(year);
-        if (months.size() == 12) {
-            lunarMonthRaw.set(month);
-        } else {
-            for (int monthId = 0; monthId < months.size(); monthId++) {
-                LunarMonth m = months.get(monthId);
-                if (m.value == month) {
-                    lunarMonthRaw.set(monthId);
-                    break;
-                }
-            }
-        }
+        calculateLunarMonth(month, 0);
 
         validateLunarValues();
         calculateSolar();
@@ -166,14 +159,22 @@ public class Lumindate extends BaseObservable implements Parcelable {
 
         lunarDay.set(lunarValues[0]);
         lunarYear.set(lunarValues[2]);
+        calculateLunarMonth(lunarValues[1] - 1, lunarValues[3]);
+    }
 
+    private void calculateLunarMonth(int value, int leap) {
         List<LunarMonth> months = LunarMonth.getLunarMonths(lunarYear.get());
+        String[] monthLabels = new String[months.size()];
         for (int monthId = 0; monthId < months.size(); monthId++) {
             LunarMonth m = months.get(monthId);
-            if (m.value == lunarValues[1] - 1 && m.leap == lunarValues[3]) {
+            if (m.value == value && m.leap == leap) {
                 lunarMonthRaw.set(monthId);
             }
+            monthLabels[monthId] = m.label;
         }
+
+        lunarMonths.clear();
+        lunarMonths.addAll(Arrays.asList(monthLabels));
     }
 
     private void calculateSolar() {

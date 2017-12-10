@@ -6,11 +6,12 @@
     <string name="lunar_to_solar">Converting from Lunar to Solar</string>
     <string name="title_fragment_reminder_add">Add Reminder</string>
     <string name="title_fragment_reminder_edit">Edit Reminder</string>
+    <string name="form_reminder_day">Day</string>
+    <string name="form_reminder_month">Month</string>
+    <string name="form_reminder_create_monthly">Monthly</string>
+    <string name="form_reminder_create_annually">Once a year</string>
     <string name="form_reminder_name">Reminder</string>
-    <string name="form_reminder_system_name">System Reminder</string>
     <string name="form_reminder_note">Note</string>
-    <string name="form_reminder_monthly">Monthly</string>
-    <string name="form_reminder_annually">Annually</string>
     <string name="form_reminder_lunar">Lunar</string>
     <string name="form_reminder_enabled">Enabled</string>
     <string name="form_reminder_added">Reminder added!</string>

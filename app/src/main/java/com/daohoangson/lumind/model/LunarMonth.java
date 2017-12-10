@@ -6,6 +6,7 @@ import com.daohoangson.lumind.R;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -16,11 +17,16 @@ public class LunarMonth {
     public static List<LunarMonth> getLunarMonths(int lunarYear, Context context, int labelStyle) {
         ArrayList<LunarMonth> months = new ArrayList<>();
 
-        Map<String, Integer> displayNames = null;
-        if (context != null
-                && labelStyle > 0) {
+        final Map<String, Integer> displayNames;
+        if (context != null && labelStyle > 0) {
             Calendar calendar = Calendar.getInstance();
             displayNames = calendar.getDisplayNames(Calendar.MONTH, labelStyle, Locale.getDefault());
+        } else {
+            int numOfMonths = 12;
+            displayNames = new HashMap<>(numOfMonths);
+            for (int i = 0; i < numOfMonths; i++) {
+                displayNames.put(String.valueOf(i + 1), i);
+            }
         }
         Integer lunarLeapMonth = VietCalendar.getLunarLeapMonthOrNull(
                 lunarYear, Lumindate.getTimeZoneOffset());
@@ -57,8 +63,12 @@ public class LunarMonth {
             for (Map.Entry<String, Integer> displayName : displayNames.entrySet()) {
                 if (displayName.getValue() == m.value) {
                     String label = displayName.getKey();
-                    if (m.leap > 0 && context != null) {
-                        label = context.getString(R.string.month_short_x_leap, label);
+                    if (m.leap > 0) {
+                        if (context != null) {
+                            label = context.getString(R.string.month_short_x_leap, label);
+                        } else {
+                            label += "*";
+                        }
                     }
 
                     m.label = label;

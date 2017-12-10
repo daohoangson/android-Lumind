@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,7 +17,8 @@ import android.view.inputmethod.InputMethodManager;
 
 import com.daohoangson.lumind.databinding.ActivityMainBinding;
 import com.daohoangson.lumind.fragment.CalendarFragment;
-import com.daohoangson.lumind.fragment.ReminderFragment;
+import com.daohoangson.lumind.fragment.ReminderAddFragment;
+import com.daohoangson.lumind.fragment.ReminderBaseFragment;
 import com.daohoangson.lumind.fragment.RemindersFragment;
 import com.daohoangson.lumind.fragment.SettingsFragment;
 import com.daohoangson.lumind.model.DataStore;
@@ -34,7 +34,7 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity
         implements CalendarFragment.CallerActivity,
-        ReminderFragment.CallerActivity,
+        ReminderBaseFragment.CallerActivity,
         RemindersFragment.CallerActivity {
 
     private static final String ARG_NTF_REMINDER_NTF_ID = "ntfReminderNtfId";
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        binding.fab.setOnClickListener(view -> startFabAction());
+        binding.fab.setOnClickListener(view -> startAddingReminder(binding));
 
         mPagerCapable = itemId -> binding.viewPager.setCurrentItem(itemId, true);
     }
@@ -140,13 +140,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public FloatingActionButton getFab() {
-        return (FloatingActionButton) findViewById(R.id.fab);
-    }
-
-    @Override
     public void onReminderSaved(Reminder reminder, boolean hasListeners) {
-        hideSoftKeyboard();
+        hideKeyboard();
 
         Snackbar.make(findViewById(R.id.viewPager),
                 reminder.isInsert()
@@ -198,22 +193,32 @@ public class MainActivity extends AppCompatActivity
         mRemindersFragmentRef = new WeakReference<>(f);
     }
 
-    private void resetViews(ActivityMainBinding binding) {
-        binding.fab.setVisibility(View.GONE);
+    @Override
+    public void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm == null) {
+            return;
+        }
 
-        hideSoftKeyboard();
+        imm.hideSoftInputFromWindow(findViewById(R.id.viewPager).getWindowToken(), 0);
+    }
+
+    @Override
+    public void showKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm == null) {
+            return;
+        }
+
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+    }
+
+    private void resetViews(ActivityMainBinding binding) {
+        hideKeyboard();
 
         int tabId = binding.viewPager.getCurrentItem();
         switch (tabId) {
-            case 0:
-                if (mCalendarFragmentRef != null) {
-                    CalendarFragment calendarFragment = mCalendarFragmentRef.get();
-                    if (calendarFragment != null) {
-                        calendarFragment.setActiveTab(this);
-                    }
-                }
-                break;
-            case 1:
+            case PAGER_ITEM_REMINDERS:
                 if (mRemindersFragmentRef != null) {
                     RemindersFragment remindersFragment = mRemindersFragmentRef.get();
                     if (remindersFragment != null) {
@@ -221,15 +226,8 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
         }
-    }
 
-    private void hideSoftKeyboard() {
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm == null) {
-            return;
-        }
-
-        imm.hideSoftInputFromWindow(findViewById(R.id.viewPager).getWindowToken(), 0);
+        binding.fab.setVisibility(tabId == PAGER_ITEM_SETTINGS ? View.GONE : View.VISIBLE);
     }
 
     private void setLanguage() {
@@ -254,13 +252,31 @@ public class MainActivity extends AppCompatActivity
                 actual != null ? actual.getLanguage() : "N/A", expected.getLanguage()));
     }
 
-    private void startFabAction() {
-        if (mCalendarFragmentRef != null) {
-            CalendarFragment calendarFragment = mCalendarFragmentRef.get();
-            if (calendarFragment != null) {
-                calendarFragment.startFabAction();
-            }
+    private void startAddingReminder(ActivityMainBinding binding) {
+        final ReminderAddFragment f;
+        int tabId = binding.viewPager.getCurrentItem();
+        if (tabId == PAGER_ITEM_CALENDAR && mCalendarFragmentRef != null) {
+            f = ReminderAddFragment.newInstance(mCalendarFragmentRef.get().mDate);
+        } else {
+            f = new ReminderAddFragment();
         }
+
+        FragmentManager fm = getSupportFragmentManager();
+        f.addOnDismissListener((reminder, completed, error) -> {
+            if (error != null) {
+                onReminderError(reminder, error, false);
+                return;
+            }
+
+            if (completed) {
+                onReminderSaved(reminder, false);
+
+                if (mPagerCapable != null) {
+                    mPagerCapable.setPagerItem(PAGER_ITEM_REMINDERS);
+                }
+            }
+        });
+        f.show(fm, f.toString());
     }
 
     class ViewPagerAdapter extends FragmentPagerAdapter {

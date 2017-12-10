@@ -23,7 +23,7 @@
         android:paddingRight="@dimen/activityHorizontalMargin"
         android:paddingTop="@dimen/activityVerticalMargin"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context="com.daohoangson.lumind.fragment.ReminderFragment">
+        tools:context="com.daohoangson.lumind.fragment.ReminderEditFragment">
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -38,44 +38,6 @@
                 android:text="@={reminder.name}" />
 
         </android.support.design.widget.TextInputLayout>
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="@{reminder.isSystem() ? View.VISIBLE : View.GONE }">
-
-            <android.support.design.widget.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:enabled="false"
-                android:hint="@string/form_reminder_system_name"
-                android:text="@{reminder.getNameForShow(context)}"
-                tools:visibility="gone" />
-
-        </android.support.design.widget.TextInputLayout>
-
-        <RadioGroup
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:checkedButton="@={reminder.monthlyOrAnnually}"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/monthly"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:enabled="@{!reminder.isSystem()}"
-                android:text="@string/form_reminder_monthly" />
-
-            <RadioButton
-                android:id="@+id/annually"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:enabled="@{!reminder.isSystem()}"
-                android:text="@string/form_reminder_annually" />
-        </RadioGroup>
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"

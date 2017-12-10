@@ -120,8 +120,12 @@ public class RemindersFragment extends Fragment {
         mAdapter.notifyItemRangeRemoved(0, oldItemCount);
 
         DataStore.getReminders(getContext(), results -> {
-            Calendar calendar = Calendar.getInstance();
-            Collections.sort(results, (reminder, t1) -> reminder.getNextOccurrence(calendar).compareTo(t1.getNextOccurrence(calendar)));
+            Calendar since = Calendar.getInstance();
+            Collections.sort(results, (r0, r1) -> {
+                Calendar no0 = r0.getNextOccurrence(since);
+                Calendar no1 = r1.getNextOccurrence(since);
+                return no0.compareTo(no1);
+            });
 
             mAdapter.data.addAll(results);
             mAdapter.notifyItemRangeInserted(0, results.size());
@@ -143,7 +147,18 @@ public class RemindersFragment extends Fragment {
         return (CallerActivity) activity;
     }
 
-    private void onReminder(ReminderViewHolder vh, Reminder reminder, Throwable error) {
+    private void onReminder(ReminderViewHolder vh, Reminder reminder, boolean saved) {
+        if (vh == null) {
+            if (!saved) {
+                return;
+            }
+
+            // new reminder
+            mAdapter.data.add(reminder);
+            mAdapter.notifyItemInserted(mAdapter.data.size() - 1);
+            return;
+        }
+
         int position = vh.getAdapterPosition();
         if (position < 0 || position >= mAdapter.data.size()) {
             startRefreshing();
@@ -156,11 +171,13 @@ public class RemindersFragment extends Fragment {
             return;
         }
 
-        if (error != null) {
+        if (!saved) {
+            // revert reminder view with data previously in adapter
             vh.bind(vhReminder);
             return;
         }
 
+        // update reminder in-place
         mAdapter.data.remove(position);
         mAdapter.data.add(position, reminder);
         vh.bind(reminder);
@@ -191,10 +208,10 @@ public class RemindersFragment extends Fragment {
         }
 
         FragmentManager fm = activity.getSupportFragmentManager();
-        ReminderFragment reminderFragment = ReminderFragment.newInstance(reminder);
-        reminderFragment.addOnDismissListener((edited, error) -> onReminder(vh, edited, error));
+        ReminderEditFragment reminderEditFragment = ReminderEditFragment.newInstance(reminder);
+        reminderEditFragment.addOnDismissListener((edited, completed, error) -> onReminder(vh, edited, completed && error != null));
 
-        reminderFragment.show(fm, reminderFragment.toString());
+        reminderEditFragment.show(fm, reminderEditFragment.toString());
     }
 
     private void startDeletingReminder(ReminderViewHolder vh) {
@@ -241,7 +258,7 @@ public class RemindersFragment extends Fragment {
         DataStore.saveReminder(getContext(), toggled, new DataStore.OnTransactionCompleteListener() {
             @Override
             public void onTransactionSuccess() {
-                onReminder(vh, toggled, null);
+                onReminder(vh, toggled, true);
 
                 CallerActivity activity = getCallerActivity();
                 if (activity != null) {
@@ -251,7 +268,7 @@ public class RemindersFragment extends Fragment {
 
             @Override
             public void onTransactionError(Throwable error) {
-                onReminder(vh, toggled, error);
+                onReminder(vh, toggled, false);
 
                 CallerActivity activity = getCallerActivity();
                 if (activity != null) {

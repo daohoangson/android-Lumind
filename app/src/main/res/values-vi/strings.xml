@@ -6,11 +6,12 @@
     <string name="lunar_to_solar">Âm lịch qua Dương lịch</string>
     <string name="title_fragment_reminder_add">Thêm thông báo</string>
     <string name="title_fragment_reminder_edit">Sửa thông báo</string>
+    <string name="form_reminder_day">Ngày</string>
+    <string name="form_reminder_month">Tháng</string>
+    <string name="form_reminder_create_monthly">Hàng tháng</string>
+    <string name="form_reminder_create_annually">1 lần/năm</string>
     <string name="form_reminder_name">Thông báo</string>
-    <string name="form_reminder_system_name">Thông báo</string>
     <string name="form_reminder_note">Ghi chú</string>
-    <string name="form_reminder_monthly">Hàng tháng</string>
-    <string name="form_reminder_annually">Hàng năm</string>
     <string name="form_reminder_lunar">Âm lịch</string>
     <string name="form_reminder_enabled">Hoạt động</string>
     <string name="form_reminder_added">Đã thêm thông báo!</string>
