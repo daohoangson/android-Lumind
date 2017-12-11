@@ -209,7 +209,7 @@ public class RemindersFragment extends Fragment {
 
         FragmentManager fm = activity.getSupportFragmentManager();
         ReminderEditFragment reminderEditFragment = ReminderEditFragment.newInstance(reminder);
-        reminderEditFragment.addOnDismissListener((edited, completed, error) -> onReminder(vh, edited, completed && error != null));
+        reminderEditFragment.addOnDismissListener((edited, completed, error) -> onReminder(vh, edited, completed && error == null));
 
         reminderEditFragment.show(fm, reminderEditFragment.toString());
     }

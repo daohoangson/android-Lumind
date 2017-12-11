@@ -53,5 +53,24 @@
 
         </android.support.design.widget.TextInputLayout>
 
+        <CheckBox
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="@={reminder.when0}"
+            android:text="@string/form_reminder_when0"
+            tools:checked="true" />
+
+        <CheckBox
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="@={reminder.when1}"
+            android:text="@string/form_reminder_when1" />
+
+        <CheckBox
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="@={reminder.when7}"
+            android:text="@string/form_reminder_when7" />
+
     </LinearLayout>
 </layout>

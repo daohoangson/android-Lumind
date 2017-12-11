@@ -2,12 +2,13 @@ package com.daohoangson.lumind.model;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import io.realm.RealmObject;
@@ -19,6 +20,9 @@ public class ReminderPersist extends RealmObject {
     private static final String DATA_NAME = "name";
     private static final String DATA_NOTE = "note";
     private static final String DATA_RECURRENCE = "recurrence";
+    private static final String DATA_WHEN0 = "when0";
+    private static final String DATA_WHEN1 = "when1";
+    private static final String DATA_WHEN7 = "when7";
 
     @SuppressWarnings("CanBeFinal")
     @PrimaryKey
@@ -37,7 +41,7 @@ public class ReminderPersist extends RealmObject {
         uuid = UUID.randomUUID().toString();
     }
 
-    public ReminderPersist(String uuid) {
+    ReminderPersist(String uuid) {
         this.uuid = uuid;
     }
 
@@ -67,6 +71,28 @@ public class ReminderPersist extends RealmObject {
 
     Type getType() {
         return Type.values()[type];
+    }
+
+    public List<Integer> getWhen() {
+        List<Integer> when = new ArrayList<>();
+
+        Object when0 = getData(DATA_WHEN0);
+        if (when0 == null || (Boolean) when0) {
+            // when0 = true, by default
+            when.add(0);
+        }
+
+        Object when1 = getData(DATA_WHEN1);
+        if (when1 != null && (Boolean) when1) {
+            when.add(1);
+        }
+
+        Object when7 = getData(DATA_WHEN7);
+        if (when7 != null && (Boolean) when7) {
+            when.add(7);
+        }
+
+        return when;
     }
 
     public ReminderPersist with(Recurrence recurrence) {
@@ -114,9 +140,21 @@ public class ReminderPersist extends RealmObject {
         return withData(DATA_NOTE, note);
     }
 
+    ReminderPersist withWhen0(boolean enabled) {
+        return withData(DATA_WHEN0, enabled);
+    }
+
+    ReminderPersist withWhen1(boolean enabled) {
+        return withData(DATA_WHEN1, enabled);
+    }
+
+    ReminderPersist withWhen7(boolean enabled) {
+        return withData(DATA_WHEN7, enabled);
+    }
+
     private void ensureDataObj() {
         if (mDataObj == null) {
-            if (!TextUtils.isEmpty(data)) {
+            if (data != null) {
                 try {
                     mDataObj = new JSONObject(data);
                 } catch (JSONException e) {

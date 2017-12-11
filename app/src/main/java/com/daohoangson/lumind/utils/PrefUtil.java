@@ -15,16 +15,6 @@ public class PrefUtil {
         return getShared(context).getBoolean(SettingsFragment.PREF_REMIND, false);
     }
 
-    public static int getRemindHowFar(Context context) {
-        String value = getShared(context).getString(SettingsFragment.PREF_REMIND_HOW_FAR, "");
-
-        try {
-            return Integer.parseInt(value);
-        } catch (NumberFormatException e) {
-            return 3;
-        }
-    }
-
     private static SharedPreferences getShared(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context);
     }

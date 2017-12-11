@@ -15,8 +15,6 @@ public class NextOccurrence {
         double timeZoneOffset = Lumindate.getTimeZoneOffset();
 
         while (true) {
-            c.add(Calendar.DATE, 1);
-
             int[] tmpLunar = VietCalendar.convertSolar2Lunar(c.get(Calendar.DATE),
                     c.get(Calendar.MONTH) + 1, c.get(Calendar.YEAR), timeZoneOffset);
             int daysInMonth = VietCalendar.getLunarDaysInMonth(tmpLunar[1],
@@ -32,6 +30,8 @@ public class NextOccurrence {
                     return c;
                 }
             }
+
+            c.add(Calendar.DATE, 1);
         }
     }
 }

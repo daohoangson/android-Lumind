@@ -14,6 +14,9 @@
     <string name="form_reminder_note">Ghi chú</string>
     <string name="form_reminder_lunar">Âm lịch</string>
     <string name="form_reminder_enabled">Hoạt động</string>
+    <string name="form_reminder_when0">Báo đúng ngày</string>
+    <string name="form_reminder_when1">Báo trước một ngày</string>
+    <string name="form_reminder_when7">Báo trước một tuần</string>
     <string name="form_reminder_added">Đã thêm thông báo!</string>
     <string name="form_reminder_updated">Đã lưu thông báo!</string>
     <string name="form_reminder_error">Lưu thông báo không thành công, xin vui lòng thử lại.</string>
@@ -23,16 +26,21 @@
     <string name="reminder_default_daily_first">Mùng một</string>
     <string name="reminder_default_daily_fifteenth">Rằm</string>
     <string name="reminder_default_vesak">Phật Đản</string>
-    <string name="remind_monthly">Nhắc hàng tháng</string>
-    <string name="remind_annually">Nhắc mỗi năm một lần</string>
-    <string name="next_occurrence_in_x">\u00A0(trong %s nữa)</string>
-    <string name="next_occurrence_tomorrow">\u00A0(ngày mai)</string>
-    <string name="next_occurrence_day_after_tomorrow">\u00A0(ngày kia)</string>
+    <string name="remind_monthly_when_x">Nhắc hàng tháng vào %s</string>
+    <string name="remind_annually_when_x">Nhắc mỗi năm một lần vào %s</string>
+    <string name="remind_when_x_y">%s và %s</string>
+    <string name="remind_when_x_y_z">%s, %s và %s</string>
+    <string name="remind_when0">đúng ngày</string>
+    <string name="remind_when1">trước một ngày</string>
+    <string name="remind_when7">trước một tuần</string>
+    <string name="next_occurrence_when_today">hôm nay</string>
+    <string name="next_occurrence_when_tomorrow">ngày mai</string>
+    <string name="next_occurrence_when_day_after_tomorrow">ngày kia</string>
+    <string name="next_occurrence_when_in_a_week">một tuần nữa</string>
     <string name="reminder_has_been_deleted">Đã xoá thông báo.</string>
     <string name="reminder_undelete">Huỷ xoá</string>
     <string name="title_fragment_settings">Thiết lập</string>
     <string name="pref_remind">Thông báo</string>
-    <string name="pref_remind_how_far">Báo trước bao lâu</string>
     <string name="pref_language">Ngôn ngữ / Language</string>
     <string name="reminder_ntf_channel_name">Thông báo</string>
 
@@ -40,12 +48,6 @@
         <item>Xem ngày</item>
         <item>Sửa</item>
         <item>Xoá</item>
-    </string-array>
-    <string-array name="pref_remind_how_far">
-        <item>Một ngày</item>
-        <item>3 ngày</item>
-        <item>Một tuần</item>
-        <item>Một tháng (30 ngày)</item>
     </string-array>
     <string-array name="pref_language">
         <item>Mặc định (Tiếng Việt)</item>

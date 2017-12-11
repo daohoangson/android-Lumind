@@ -6,15 +6,6 @@
         android:title="@string/pref_remind" />
 
     <ListPreference
-        android:defaultValue="3"
-        android:dependency="pref_remind"
-        android:entries="@array/pref_remind_how_far"
-        android:entryValues="@array/pref_remind_how_far_values"
-        android:key="pref_remind_how_far"
-        android:summary="@string/pref_remind_how_far_summary"
-        android:title="@string/pref_remind_how_far" />
-
-    <ListPreference
         android:defaultValue="default"
         android:dependency="pref_language"
         android:entries="@array/pref_language"

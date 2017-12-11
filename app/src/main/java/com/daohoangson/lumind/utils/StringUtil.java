@@ -2,7 +2,7 @@ package com.daohoangson.lumind.utils;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.format.DateUtils;
 
 import com.daohoangson.lumind.R;
@@ -29,29 +29,35 @@ public class StringUtil {
         }
     }
 
-    @NonNull
-    public static String formatNextOccurrenceInX(Resources r, Calendar since, Calendar next) {
-        long tSince = since.getTimeInMillis();
-        long tNext = next.getTimeInMillis();
-        long durationInSec = (tNext - tSince) / 1000;
-        int days = (int) Math.ceil(durationInSec / 86400.0);
-        int months = (int) Math.ceil(days / 31.0);
+    public static int calculateDays(Calendar since, Calendar calendar) {
+        long t1 = since.getTimeInMillis();
+        long t2 = calendar.getTimeInMillis();
 
-        if (days <= 0) {
-            return "";
+        return (int) Math.ceil((t2 - t1) / 1000 / 86400.0);
+    }
+
+    @Nullable
+    public static String formatNextOccurrenceWhen(Resources r, int days) {
+        if (days < 0) {
+            return null;
         }
 
+        int months = (int) Math.ceil(days / 31.0);
         if (months > 1) {
-            return r.getString(R.string.next_occurrence_in_x, r.getQuantityString(R.plurals.x_months, months, months));
+            return r.getQuantityString(R.plurals.x_months, months, months);
         }
 
         switch (days) {
+            case 0:
+                return r.getString(R.string.next_occurrence_when_today);
             case 1:
-                return r.getString(R.string.next_occurrence_tomorrow);
+                return r.getString(R.string.next_occurrence_when_tomorrow);
             case 2:
-                return r.getString(R.string.next_occurrence_day_after_tomorrow);
+                return r.getString(R.string.next_occurrence_when_day_after_tomorrow);
+            case 7:
+                return r.getString(R.string.next_occurrence_when_in_a_week);
             default:
-                return r.getString(R.string.next_occurrence_in_x, r.getQuantityString(R.plurals.x_days, days, days));
+                return r.getQuantityString(R.plurals.x_days, days, days);
         }
     }
 }

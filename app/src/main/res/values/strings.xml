@@ -14,6 +14,9 @@
     <string name="form_reminder_note">Note</string>
     <string name="form_reminder_lunar">Lunar</string>
     <string name="form_reminder_enabled">Enabled</string>
+    <string name="form_reminder_when0">Remind on the date</string>
+    <string name="form_reminder_when1">Remind the day before</string>
+    <string name="form_reminder_when7">Remind a week prior</string>
     <string name="form_reminder_added">Reminder added!</string>
     <string name="form_reminder_updated">Reminder saved!</string>
     <string name="form_reminder_error">Cannot save reminder, please try again later.</string>
@@ -24,17 +27,22 @@
     <string name="reminder_default_daily_first">The 1st</string>
     <string name="reminder_default_daily_fifteenth">The 15th</string>
     <string name="reminder_default_vesak">Vesak</string>
-    <string name="remind_monthly">Remind every month</string>
-    <string name="remind_annually">Remind once a year</string>
-    <string name="next_occurrence_in_x">\u00A0(in %s)</string>
-    <string name="next_occurrence_tomorrow">\u00A0(tomorrow)</string>
-    <string name="next_occurrence_day_after_tomorrow">\u00A0(day after tomorrow)</string>
+    <string name="remind_monthly_when_x">Remind every month %s</string>
+    <string name="remind_annually_when_x">Remind once a year %s</string>
+    <string name="remind_when_x_y">%s and %s</string>
+    <string name="remind_when_x_y_z">%s, %s and %s</string>
+    <string name="remind_when0">on the date</string>
+    <string name="remind_when1">the day before</string>
+    <string name="remind_when7">a week prior</string>
+    <string name="next_occurrence_date_x_when_y" translatable="false">%s (%s)</string>
+    <string name="next_occurrence_when_today">today</string>
+    <string name="next_occurrence_when_tomorrow">tomorrow</string>
+    <string name="next_occurrence_when_day_after_tomorrow">day after tomorrow</string>
+    <string name="next_occurrence_when_in_a_week">in a week</string>
     <string name="reminder_has_been_deleted">Reminder has been removed.</string>
     <string name="reminder_undelete">Undo</string>
     <string name="title_fragment_settings">Settings</string>
     <string name="pref_remind">Daily Reminder</string>
-    <string name="pref_remind_how_far">How far away to remind</string>
-    <string name="pref_remind_how_far_summary" translatable="false">%s</string>
     <string name="pref_language">Language</string>
     <string name="pref_language_summary" translatable="false">%s</string>
     <string name="reminder_ntf_channel_name">Daily Reminder</string>
@@ -48,18 +56,6 @@
         <item>View in calendar</item>
         <item>Edit</item>
         <item>Delete</item>
-    </string-array>
-    <string-array name="pref_remind_how_far">
-        <item>A day</item>
-        <item>3 days</item>
-        <item>A week</item>
-        <item>A month (30 days)</item>
-    </string-array>
-    <string-array name="pref_remind_how_far_values" tools:ignore="MissingTranslation">
-        <item>1</item>
-        <item>3</item>
-        <item>7</item>
-        <item>30</item>
     </string-array>
     <string-array name="pref_language">
         <item>Default (English)</item>

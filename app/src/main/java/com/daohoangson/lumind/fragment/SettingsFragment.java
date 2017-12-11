@@ -13,7 +13,6 @@ import com.daohoangson.lumind.schedule.ReminderEngine;
 public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static final String PREF_REMIND = "pref_remind";
-    public static final String PREF_REMIND_HOW_FAR = "pref_remind_how_far";
     public static final String PREF_LANGUAGE = "pref_language";
     public static final String PREF_LANGUAGE_DEFAULT = "default";
 

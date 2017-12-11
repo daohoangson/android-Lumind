@@ -119,20 +119,50 @@ public class ParcelableTest {
 
     @Test
     public void testReminderEnabled() {
-        Reminder reminder1 = new Reminder(Lumindate.getInstance());
-        reminder1.enabled.set(true);
-        Reminder reminder2 = doIt(reminder1, Reminder.CREATOR);
+        for (int i = 0; i < 2; i++) {
+            boolean enabled = i > 0;
+            Reminder reminder1 = new Reminder(Lumindate.getInstance());
+            reminder1.enabled.set(enabled);
+            Reminder reminder2 = doIt(reminder1, Reminder.CREATOR);
 
-        assertEquals(true, reminder2.enabled.get());
+            assertEquals(enabled, reminder2.enabled.get());
+        }
     }
 
     @Test
-    public void testReminderDisabled() {
-        Reminder reminder1 = new Reminder(Lumindate.getInstance());
-        reminder1.enabled.set(false);
-        Reminder reminder2 = doIt(reminder1, Reminder.CREATOR);
+    public void testReminderWhen0() {
+        for (int i = 0; i < 2; i++) {
+            boolean enabled = i > 0;
+            Reminder reminder1 = new Reminder(Lumindate.getInstance());
+            reminder1.when0.set(enabled);
+            Reminder reminder2 = doIt(reminder1, Reminder.CREATOR);
 
-        assertEquals(false, reminder2.enabled.get());
+            assertEquals(enabled, reminder2.when0.get());
+        }
+    }
+
+    @Test
+    public void testReminderWhen1() {
+        for (int i = 0; i < 2; i++) {
+            boolean enabled = i > 0;
+            Reminder reminder1 = new Reminder(Lumindate.getInstance());
+            reminder1.when1.set(enabled);
+            Reminder reminder2 = doIt(reminder1, Reminder.CREATOR);
+
+            assertEquals(enabled, reminder2.when1.get());
+        }
+    }
+
+    @Test
+    public void testReminderWhen7() {
+        for (int i = 0; i < 2; i++) {
+            boolean enabled = i > 0;
+            Reminder reminder1 = new Reminder(Lumindate.getInstance());
+            reminder1.when7.set(enabled);
+            Reminder reminder2 = doIt(reminder1, Reminder.CREATOR);
+
+            assertEquals(enabled, reminder2.when7.get());
+        }
     }
 
     private <T extends Parcelable> T doIt(T original, Parcelable.Creator<T> creator) {

@@ -14,6 +14,7 @@ import com.daohoangson.lumind.utils.NextOccurrence;
 import com.daohoangson.lumind.utils.StringUtil;
 
 import java.util.Calendar;
+import java.util.List;
 
 public class Reminder implements Parcelable {
 
@@ -29,6 +30,10 @@ public class Reminder implements Parcelable {
     @SuppressWarnings("WeakerAccess")
     public final ObservableField<String> note = new ObservableField<>("");
     public final ObservableBoolean enabled = new ObservableBoolean(true);
+
+    public final ObservableBoolean when0 = new ObservableBoolean(true);
+    public final ObservableBoolean when1 = new ObservableBoolean(false);
+    public final ObservableBoolean when7 = new ObservableBoolean(false);
 
     private Calendar mNextOccurrenceSince = null;
     private Calendar mNextOccurrence = null;
@@ -51,6 +56,24 @@ public class Reminder implements Parcelable {
         note.set(persist.getNote());
         enabled.set(persist.enabled);
 
+        when0.set(false);
+        when1.set(false);
+        when7.set(false);
+        List<Integer> when = persist.getWhen();
+        for (Integer whenX : when) {
+            switch (whenX) {
+                case 0:
+                    when0.set(true);
+                    break;
+                case 1:
+                    when1.set(true);
+                    break;
+                case 7:
+                    when7.set(true);
+                    break;
+            }
+        }
+
         setupCallbacks();
     }
 
@@ -63,6 +86,10 @@ public class Reminder implements Parcelable {
         name.set(in.readString());
         note.set(in.readString());
         enabled.set(in.readInt() > 0);
+
+        when0.set(in.readInt() > 0);
+        when1.set(in.readInt() > 0);
+        when7.set(in.readInt() > 0);
 
         setupCallbacks();
     }
@@ -94,6 +121,10 @@ public class Reminder implements Parcelable {
         parcel.writeString(name.get());
         parcel.writeString(note.get());
         parcel.writeInt(enabled.get() ? 1 : 0);
+
+        parcel.writeInt(when0.get() ? 1 : 0);
+        parcel.writeInt(when1.get() ? 1 : 0);
+        parcel.writeInt(when7.get() ? 1 : 0);
     }
 
     @Override
@@ -110,7 +141,10 @@ public class Reminder implements Parcelable {
                 monthly.get() != other.monthly.get() ||
                 !TextUtils.equals(name.get(), other.name.get()) ||
                 !TextUtils.equals(note.get(), other.note.get()) ||
-                enabled.get() != other.enabled.get());
+                enabled.get() != other.enabled.get()) ||
+                when0.get() != other.when0.get() ||
+                when1.get() != other.when1.get() ||
+                when7.get() != other.when7.get();
     }
 
     @Override
@@ -143,10 +177,14 @@ public class Reminder implements Parcelable {
                 ReminderPersist.Recurrence.ANNUALLY;
 
         return persist.withDate(date)
-                .withEnabled(enabled.get())
+                .with(type)
+                .with(recurrence)
                 .withName(name.get())
                 .withNote(note.get())
-                .with(recurrence);
+                .withEnabled(enabled.get())
+                .withWhen0(when0.get())
+                .withWhen1(when1.get())
+                .withWhen7(when7.get());
     }
 
     public String getNameForShow(Context context) {
@@ -203,5 +241,9 @@ public class Reminder implements Parcelable {
         name.set(other.name.get());
         note.set(other.note.get());
         enabled.set(other.enabled.get());
+
+        when0.set(other.when0.get());
+        when1.set(other.when1.get());
+        when7.set(other.when7.get());
     }
 }

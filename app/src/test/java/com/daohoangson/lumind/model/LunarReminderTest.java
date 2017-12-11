@@ -26,6 +26,23 @@ public class LunarReminderTest {
     }
 
     @Test
+    public void testGetNextOccurrenceShouldPickTheTestDayEveryMonth() {
+        Reminder monthly20160115 = create(new int[]{15, 0, 2016, 0}, true);
+        test(monthly20160115, new int[]{24, 0, 2016});
+        test(monthly20160115, new int[]{22, 1, 2016});
+        test(monthly20160115, new int[]{23, 2, 2016});
+        test(monthly20160115, new int[]{21, 3, 2016});
+        test(monthly20160115, new int[]{21, 4, 2016});
+        test(monthly20160115, new int[]{19, 5, 2016});
+        test(monthly20160115, new int[]{18, 6, 2016});
+        test(monthly20160115, new int[]{17, 7, 2016});
+        test(monthly20160115, new int[]{15, 8, 2016});
+        test(monthly20160115, new int[]{15, 9, 2016});
+        test(monthly20160115, new int[]{14, 10, 2016});
+        test(monthly20160115, new int[]{13, 11, 2016});
+    }
+
+    @Test
     public void testGetNextOccurrenceShouldPickTheNextDayEveryMonth() {
         Reminder monthly20160115 = create(new int[]{15, 0, 2016, 0}, true);
         test(monthly20160115, new int[]{23, 0, 2016}, new int[]{24, 0, 2016});
@@ -121,5 +138,9 @@ public class LunarReminderTest {
         assertEquals(message,
                 String.format(Locale.US, "[%d, %d, %d]", expected[0], expected[1], expected[2]),
                 String.format(Locale.US, "[%d, %d, %d]", actual[0], actual[1], actual[2]));
+    }
+
+    private void test(Reminder r, int[] values) {
+        test(r, values, values);
     }
 }

@@ -9,6 +9,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.daohoangson.lumind.Constant;
@@ -19,11 +20,9 @@ import com.daohoangson.lumind.model.Lumindate;
 import com.daohoangson.lumind.model.Reminder;
 import com.daohoangson.lumind.model.ReminderPersist;
 import com.daohoangson.lumind.utils.NextOccurrence;
-import com.daohoangson.lumind.utils.PrefUtil;
 import com.daohoangson.lumind.utils.StringUtil;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -54,9 +53,6 @@ public class ReminderEngine {
         }
 
         Calendar since = Calendar.getInstance();
-        Calendar cutOff = (Calendar) since.clone();
-        cutOff.add(Calendar.DATE, PrefUtil.getRemindHowFar(context));
-        Date cutOffDate = cutOff.getTime();
 
         for (ReminderPersist reminder : reminders) {
             if (!reminder.enabled) {
@@ -66,7 +62,9 @@ public class ReminderEngine {
             Lumindate date = new Lumindate(reminder.timeInMillis);
             boolean monthly = reminder.getMonthly();
             Calendar no = NextOccurrence.lunar(since, date, monthly);
-            if (no.after(cutOffDate)) {
+            int days = StringUtil.calculateDays(since, no);
+            List<Integer> when = reminder.getWhen();
+            if (!when.contains(days)) {
                 continue;
             }
 
@@ -75,9 +73,9 @@ public class ReminderEngine {
                 contentTitle = new Reminder(reminder).getNameForShow(context);
             }
 
-            String formattedDate = StringUtil.formatDate(context, date, monthly);
-            String nextOccurrenceInX = StringUtil.formatNextOccurrenceInX(context.getResources(), since, no);
-            String contentText = formattedDate + nextOccurrenceInX;
+            String formattedDate = DateUtils.formatDateTime(context, date.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE);
+            String nextOccurrenceWhen = StringUtil.formatNextOccurrenceWhen(context.getResources(), days);
+            String contentText = context.getString(R.string.next_occurrence_date_x_when_y, formattedDate, nextOccurrenceWhen);
             int ntfId = (int) (no.getTimeInMillis() / 1000 / 86400);
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, Constant.NOTIFICATION_CHANNEL_REMINDER_ID)

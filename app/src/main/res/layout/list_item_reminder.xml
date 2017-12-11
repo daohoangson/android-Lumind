@@ -39,52 +39,39 @@
                 android:src="@drawable/ic_moon_colored"
                 tools:src="@drawable/ic_moon_colored" />
 
-            <TextView
-                android:id="@+id/name"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_toEndOf="@id/icon"
                 android:layout_toRightOf="@id/icon"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="@{reminder.getNameForShow(context)}"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                tools:text="@string/form_reminder_name" />
-
-            <TextView
-                android:id="@+id/note"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/name"
-                android:layout_toEndOf="@id/icon"
-                android:layout_toRightOf="@id/icon"
-                android:text="@{reminder.note}"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                tools:text="@string/form_reminder_note" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/note"
-                android:layout_toEndOf="@id/icon"
-                android:layout_toRightOf="@id/icon"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/name"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@{reminder.monthly ? @string/remind_monthly : @string/remind_annually}"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/colorAccent"
-                    tools:text="@string/remind_monthly" />
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="@{reminder.getNameForShow(context)}"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    tools:text="@string/form_reminder_name" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/note"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     app:next_occurrence_text="@{reminder}"
-                    tools:text="@string/next_occurrence_in_x" />
+                    tools:text="@string/next_occurrence_date_x_when_y" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    app:remind_when_text="@{reminder}"
+                    tools:text="@string/remind_monthly_when_x" />
+
             </LinearLayout>
 
             <CheckBox
